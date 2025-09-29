@@ -1,0 +1,115 @@
+---
+description: フロントエンド・バックエンド共通のコーディングスタイルと命名規則
+globs: ["**/*.{ts,tsx,js,jsx,py}"]
+alwaysApply: true
+---
+
+# 共通ルール: コーディングスタイル
+
+フロントエンド・バックエンド共通のコーディングスタイルルールです。
+コード作成・リファクタリング・レビュー時に以下のルールに従ってください。
+
+## 設計上の原則
+- **DRY（重複回避）** と **KISS（単純さの維持）** を徹底する
+- **可読性を最優先**とし、複雑な実装よりもわかりやすい実装を選ぶ
+
+## フォーマット
+- **プロジェクトのフォーマッタ設定に従う**（具体的なツールは各言語のルールで定義）
+
+具体的な実行コマンドは各言語のルールを参照してください：
+- バックエンド: `../01-backend/03-python-quality-check.mdc`
+- フロントエンド: `../02-frontend/03-ts-quality-check.mdc`
+
+## 命名規則
+
+### 基本原則
+- **各言語の慣例に従う**（具体的なルールは各言語のルールで定義）
+- **名前は簡潔かつ説明的にする**（何を表すかが分かる名前）
+
+### メソッドの命名規則
+- **何をするか**を名前で表現する（どうやってするかではなく）
+- **データを変更するかどうか**が分かる動詞を使う
+  - 参照系: `get`, `find`, `calculate`, `check`
+  - 更新系: `create`, `update`, `delete`, `apply`
+  - 判定系: `is`, `has`, `can`, `should`
+- **名前と処理内容を一致させる**（取得メソッドで更新処理をしない等）
+- **複雑になったら小さく分割する**（目安: 30行以内）
+
+詳細なコーディングスタイルは各言語のルールを参照してください：
+- バックエンド: `../01-backend/04-python-coding-style.mdc`
+- フロントエンド: `../02-frontend/04-ts-coding-style.mdc`
+
+## メソッド命名の実例
+
+**悪い例（ロジックをなぞった名前）**
+```
+❌ ロジックをなぞったようなメソッド名
+class Magic {
+   boolean isMemberHpMoreThanZeroAndIsMemberCanActAndIsMemberMpMoreThanMagicCostMp(Member member) {
+     if (0 < member.hitPoint) {
+       if (member.canAct()) {
+         if (costMagicPoint <= member.magicPoint) {
+           return true;
+         }
+       }
+     }
+     return false;
+   }
+}
+```
+
+**悪い例（名前から類推できない副作用）**
+```
+❌ メソッド名から類推できないことをやっている
+class Order {
+   private final OrderId id;
+   private final Items items;
+   private GiftPoint giftPoint;
+
+   int itemCount() {
+     int count = items.count();
+     // 注文商品数が10個以上ならお買い物ギフトポイントを100追加する。
+     if (10 <= count) {
+       giftPoint = giftPoint.add(new GiftPoint(100));
+     }
+     return count;
+   }
+}
+```
+
+**良い例（意図が分かる名前）**
+```
+◎ 意図や目的がわかるメソッド名
+class Magic {
+   boolean canChant(final Member member) {
+     if (member.hitPoint <= 0) return false;
+     if (!member.canAct()) return false;
+     if (member.magicPoint < costMagicPoint) return false;
+     return true;
+   }
+}
+```
+
+**良い例（意図と名前を一致させる分割）**
+```
+◎ ロジックの意図と名前を一致させる
+class Order {
+   private final OrderId id;
+   private final Items items;
+   private GiftPoint giftPoint;
+
+   int itemCount() {
+     return items.count();
+   }
+
+   boolean shouldAddGiftPoint() {
+     return 10 <= itemCount();
+   }
+
+  void tryAddGiftPoint() {
+    if (shouldAddGiftPoint()) {
+      giftPoint = giftPoint.add(new GiftPoint(100));
+    }
+  }
+}
+```

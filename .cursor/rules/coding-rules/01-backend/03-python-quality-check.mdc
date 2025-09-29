@@ -1,0 +1,127 @@
+---
+description: バックエンド（FastAPI）の品質保証コマンドと実行方法
+globs: ["**/*.py"]
+alwaysApply: false
+---
+
+# バックエンド (FastAPI): 品質保証
+
+Python バックエンド開発における品質保証の具体的な実行方法です。
+コード変更時・コミット前・CI実行時に以下のルールに従ってください。
+
+## 必須チェック（この順序で実行）
+
+```bash
+# 1. フォーマットチェック
+uv run ruff format --check .
+
+# 2. リンターチェック  
+uv run ruff check .
+
+# 3. 型チェック
+uv run ty check .
+
+# 4. テスト実行
+uv run pytest
+```
+
+### チェック内容の詳細
+
+#### 1. フォーマットチェック
+- **目的**: コードスタイルの統一性を確認
+- **合格条件**: 差分ゼロ（修正提案がない状態）
+- **エラー時**: `uv run ruff format .` で自動修正
+
+#### 2. リンターチェック
+- **目的**: コード品質・潜在バグの検出
+- **合格条件**: エラー 0・警告 0
+- **エラー時**: `uv run ruff check . --fix` で自動修正（安全な修正のみ）
+
+#### 3. 型チェック
+- **目的**: 型アノテーションの正確性確認
+- **合格条件**: 型エラー 0
+- **エラー時**: 手動でコード修正が必要
+
+#### 4. テスト実行
+- **目的**: 機能の正確性確認
+- **合格条件**: 全テストがパス
+- **エラー時**: テストコードまたは実装コードの修正が必要
+- **テスト実装の詳細**: `05-testing-rule.mdc` を参照
+
+## 自動修正コマンド（開発時のみ）
+
+```bash
+# フォーマット自動修正
+uv run ruff format .
+
+# リンター自動修正（安全な修正のみ）
+uv run ruff check . --fix
+
+# インポート文の整理
+uv run ruff check . --select I --fix
+```
+
+### 自動修正の注意点
+- **安全な修正のみ**: ロジックを変更する可能性がある修正は手動で確認
+- **差分確認**: 自動修正後は必ず変更内容を確認
+- **テスト実行**: 自動修正後は必ずテストを実行
+
+## 品質保証のタイミング
+
+### コード作成時
+```bash
+# 開発中の継続的チェック
+uv run ruff format .
+uv run ruff check .
+```
+
+### コミット前
+```bash
+# 全チェックを順次実行
+uv run ruff format --check .
+uv run ruff check .
+uv run ty check .
+uv run pytest
+```
+
+### コードレビュー前
+```bash
+# 最終確認
+uv run ruff format --check .
+uv run ruff check .
+uv run ty check .
+uv run pytest --cov=src --cov-report=html
+```
+
+## エラー対応ガイド
+
+### よくあるエラーパターン
+
+#### Ruff Format エラー
+```bash
+# エラー例: would reformat 3 files
+# 対応: 自動修正を実行
+uv run ruff format .
+```
+
+#### Ruff Linter エラー
+```bash
+# エラー例: F401 `os` imported but unused
+# 対応: 不要なインポート削除
+uv run ruff check . --fix
+```
+
+#### 型チェックエラー
+```python
+# エラー例: error: Argument 1 to "len" has incompatible type "int"; expected "Sized"
+# 対応: 型アノテーションの修正
+def get_length(items: List[str]) -> int:  # List[str] を追加
+    return len(items)
+```
+
+#### テストエラー
+```bash
+# エラー例: FAILED tests/test_user.py::test_create_user
+# 対応: テストコードまたは実装コードの修正
+pytest tests/test_user.py::test_create_user -v  # 詳細確認
+```

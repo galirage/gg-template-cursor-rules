@@ -1,0 +1,21 @@
+---
+description: バックエンド（FastAPI）で使用する技術スタック
+globs: ["**/*.py"]
+alwaysApply: false
+---
+
+# バックエンド (FastAPI): 技術スタック
+
+## 技術スタック一覧
+
+| 技術        | 用途               | 公式ドキュメント |
+|-------------|--------------------|--------------------|
+| Python      | プログラミング言語 | https://docs.python.org/3/ |
+| FastAPI     | Webフレームワーク  | https://fastapi.tiangolo.com/ |
+| SQLAlchemy  | データベース ORM   | https://docs.sqlalchemy.org/ |
+| PostgreSQL  | データベース       | https://www.postgresql.org/docs/ |
+| uv          | パッケージマネージャー | https://docs.astral.sh/uv/ |
+
+## バージョン情報
+
+具体的なバージョンについては `uv.lock` ファイルを参照してください。

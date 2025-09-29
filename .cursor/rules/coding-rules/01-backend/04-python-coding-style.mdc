@@ -1,0 +1,133 @@
+---
+description: バックエンド（FastAPI）固有のコーディングスタイルと命名規則
+globs: ["**/*.py"]
+alwaysApply: false
+---
+
+# バックエンド (FastAPI): コーディングスタイル
+
+Python バックエンド固有のコーディングスタイルルールです。
+`../00-common/01-coding-style.mdc` よりもさらに詳細なコーディングルールについて記載しています。
+
+## Python固有の命名規則
+
+### 基本的な命名パターン
+- **変数・関数名**: `snake_case` を使用
+- **クラス名**: `PascalCase` を使用  
+- **定数**: `ALL_CAPS_WITH_UNDERSCORES` を使用
+- **プライベート属性**: 先頭に `_` を付与（例: `_private_method`）
+- **特別なプライベート属性**: 先頭に `__` を付与（例: `__very_private`）
+
+### 具体例
+```python
+# ✅ 良い例
+class UserService:
+    MAX_RETRY_COUNT = 3
+    
+    def __init__(self):
+        self._db_connection = None
+        self.__internal_state = {}
+    
+    def calculate_total_amount(self, items: List[Item]) -> int:
+        return sum(item.price for item in items)
+    
+    def _validate_user_data(self, data: dict) -> bool:
+        return all(key in data for key in ['name', 'email'])
+
+# ❌ 悪い例
+class userService:  # クラス名がsnake_case
+    maxRetryCount = 3  # 定数がcamelCase
+    
+    def calculateTotalAmount(self, items):  # 関数名がcamelCase
+        return sum(item.price for item in items)
+```
+
+## 型ヒント・アノテーション
+
+### 基本的な使用方法
+- すべての関数に**引数と戻り値の型**を明示する
+- `typing` モジュールを活用して複雑な型を表現する
+- `Optional` や `Union` を適切に使い分ける
+
+### 具体例
+```python
+from typing import Optional, List, Dict, Union
+from datetime import datetime
+
+def process_users(
+    users: List[User], 
+    created_at: Optional[datetime] = None,
+    filters: Dict[str, Union[str, int]] = None
+) -> Dict[str, int]:
+    """ユーザーデータを処理する。
+    
+    Args:
+        users: 処理対象のユーザーリスト
+        created_at: 作成日時フィルター（任意）
+        filters: 追加フィルター条件（任意）
+    
+    Returns:
+        処理結果のサマリー辞書
+    """
+    if filters is None:
+        filters = {}
+    
+    # 処理ロジック
+    return {"processed": len(users), "filtered": 0}
+
+# クラスメソッドの型ヒント
+class UserRepository:
+    def find_by_id(self, user_id: int) -> Optional[User]:
+        # 実装
+        pass
+    
+    def save(self, user: User) -> User:
+        # 実装
+        pass
+```
+
+## インポート文の整理
+
+### インポート順序
+1. **標準ライブラリ**
+2. **サードパーティライブラリ**  
+3. **自作モジュール**
+
+各グループ間は空行で区切る。
+
+### 具体例
+```python
+# ✅ 良い例
+import os
+import sys
+from datetime import datetime
+from typing import List, Optional
+
+import fastapi
+from sqlalchemy import create_engine
+from pydantic import BaseModel
+
+from src.domain.user import User
+from src.usecase.user_service import UserService
+
+# ❌ 悪い例  
+from src.domain.user import User
+import os
+from pydantic import BaseModel
+import sys
+from src.usecase.user_service import UserService
+```
+
+### from import vs import の使い分け
+```python
+# ✅ 推奨: 特定の要素のみ使用する場合
+from typing import List, Optional
+from datetime import datetime
+
+# ✅ 推奨: モジュール全体を使用する場合
+import json
+import os
+
+# ❌ 避ける: ワイルドカードインポート
+from typing import *
+```
