@@ -88,46 +88,45 @@ class UserRepository:
 
 ## インポート文の整理
 
-### インポート順序
-1. **標準ライブラリ**
-2. **サードパーティライブラリ**  
-3. **自作モジュール**
+### 基本方針
+**Ruffのisort機能を使用してインポート文を自動整理する**
 
-各グループ間は空行で区切る。
+手動でインポート順序を管理する必要はありません。以下のコマンドで自動的にPEP 8準拠の順序に整理されます。
 
-### 具体例
-```python
-# ✅ 良い例
-import os
-import sys
-from datetime import datetime
-from typing import List, Optional
+### 自動整理コマンド
+```bash
+# インポート文のみを整理
+uv run ruff check . --select I --fix
 
-import fastapi
-from sqlalchemy import create_engine
-from pydantic import BaseModel
+# 全体のフォーマット（インポート含む）
+uv run ruff format .
 
-from src.domain.user import User
-from src.usecase.user_service import UserService
-
-# ❌ 悪い例  
-from src.domain.user import User
-import os
-from pydantic import BaseModel
-import sys
-from src.usecase.user_service import UserService
+# 全体のリンターチェック（インポート含む）
+uv run ruff check . --fix
 ```
 
-### from import vs import の使い分け
+### 自動整理される順序
+Ruffが以下の順序で自動整理します：
+1. **標準ライブラリ** (datetime, typing, os など)
+2. **サードパーティライブラリ** (fastapi, sqlalchemy など)
+3. **ファーストパーティ** (src.* など、自分のプロジェクト)
+
+各グループ間は自動的に空行で区切られます。
+
+### 設定
+`pyproject.toml`で設定済み：
+```toml
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+```
+
+### 避けるべきパターン
 ```python
-# ✅ 推奨: 特定の要素のみ使用する場合
-from typing import List, Optional
-from datetime import datetime
-
-# ✅ 推奨: モジュール全体を使用する場合
-import json
-import os
-
 # ❌ 避ける: ワイルドカードインポート
 from typing import *
+
+# ❌ 避ける: 不要なインポート
+import os  # 使用していない場合
 ```
+
+**注意**: インポート順序は手動で管理せず、必ずformatterに任せてください。
