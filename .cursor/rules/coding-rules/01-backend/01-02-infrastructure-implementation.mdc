@@ -1,0 +1,175 @@
+---
+globs: app/backend/src/infrastructure/**/*.py
+alwaysApply: false
+---
+# インフラ実装ルール
+
+## 概要
+
+インフラ層の実装ルールを記載します。
+新しいリポジトリを実装する際は、このルールに従ってください。
+
+> **注記**: このドキュメントのサンプルコードでは、文章量削減のためコメントを省略しています。実際の実装では、`04-python-coding-style.mdc`に従ってdocstringとインラインコメントを必ず記載してください。
+
+## 1. ディレクトリ構造
+
+```
+infrastructure/
+├── repository/
+│   └── user/
+│       ├── __init__.py
+│       └── user_repository_impl.py
+└── mapper/
+    ├── __init__.py
+    └── user_mapper.py
+```
+
+### 実装ルール
+
+- 集約ごとにディレクトリを作成
+- ファイル名は`{集約名}_repository_impl.py`の形式
+- データベースやORMライブラリごとに実装を分離
+
+## 2. リポジトリクラスの実装例
+
+### 基本的なCRUD操作のパターン
+
+```python
+class UserRepositoryImpl(UserRepository):
+    """PostgreSQLを使用したユーザーリポジトリの実装"""
+    
+    async def find_by_id(self, user_id: UserId) -> User:
+        """IDでユーザーを検索する"""
+        user = await UserModel.select().where(UserModel.id == user_id.value).first()
+        
+        if user is None:
+            raise ExpectedBusinessError(
+                code=UserErrorCode.NotFound,
+                details={"user_id": user_id.value},
+            )
+        
+        return UserMapper.to_domain(user)
+    
+    async def save(self, user: User) -> User:
+        """ユーザーを保存する"""
+        try:
+            db_data = UserMapper.to_db(user)
+            await UserModel.insert(
+                UserModel(
+                    id=db_data["id"],
+                    email=db_data["email"],
+                    role=db_data["role"],
+                    name=db_data["name"],
+                ),
+            )
+        except Exception as e:
+            if "email" in str(e).lower():
+                raise ExpectedBusinessError(
+                    code=UserErrorCode.EmailAlreadyExists,
+                    details={"email": user.email.value},
+                ) from e
+            raise
+        return user
+    
+    async def delete(self, user_id: UserId) -> UserId:
+        """ユーザーを削除する"""
+        user = await UserModel.select().where(UserModel.id == user_id.value).first()
+        
+        if user is None:
+            raise ExpectedBusinessError(
+                code=UserErrorCode.NotFound,
+                details={"user_id": user_id.value},
+            )
+        
+        await UserModel.delete().where(UserModel.id == user_id.value)
+        return UserId(value=user_id.value)
+```
+
+### Mapperクラスの実装パターン
+
+```python
+class UserMapper:
+    """ユーザーのドメインモデルとデータベースモデルの変換を行うマッパー。"""
+    
+    @staticmethod
+    def to_domain(record: dict) -> User:
+        """データベースレコードをドメインモデルに変換する"""
+        return User(
+            id=UserId(value=record["id"]),
+            name=UserName(value=record["name"]),
+            email=EmailAddress(value=record["email"]),
+            role=Role(value=RoleEnum(record["role"])),
+            created_at=record["created_at"],
+        )
+    
+    @staticmethod
+    def to_db(entity: User) -> dict:
+        """ドメインモデルをデータベース用辞書に変換する"""
+        return {
+            "id": entity.id.value,
+            "name": entity.name.value,
+            "email": entity.email.value,
+            "role": entity.role.value.value,
+            "created_at": entity.created_at,
+        }
+    
+    @staticmethod
+    def to_domain_list(records: list[dict]) -> list[User]:
+        """データベースレコードリストをドメインモデルリストに変換する"""
+        return [UserMapper.to_domain(record) for record in records]
+```
+
+### リポジトリでのMapper使用例
+
+```python
+class UserRepositoryImpl(UserRepository):
+    """PostgreSQLを使用したユーザーリポジトリの実装"""
+    
+    async def filter(self) -> list[User]:
+        """すべてのユーザーを取得する"""
+        users = await UserModel.objects()
+        return UserMapper.to_domain_list(users)
+    
+    async def find_by_email(self, email: EmailAddress) -> User:
+        """メールアドレスでユーザーを検索する"""
+        user = await UserModel.select().where(UserModel.email == email.value).first()
+        
+        if user is None:
+            raise ExpectedBusinessError(
+                code=UserErrorCode.NotFound,
+                details={"email": email.value},
+            )
+        
+        return UserMapper.to_domain(user)
+```
+
+## 3. 実装ルール
+
+### クラス設計
+
+- クラス名は`{集約名}RepositoryImpl`の形式
+- ドメイン層のリポジトリインターフェースを継承
+- すべてのメソッドを非同期で実装（`async def`）
+- すべての引数と戻り値に型ヒントを付与
+
+### エラーハンドリング
+
+- 存在チェックを削除・更新前に必ず実行
+- 制約エラーは適切なビジネスエラーに分類
+- 例外チェーンを保持（`from e`）
+- エラーメッセージから適切なエラーコードを判定
+
+### Mapper実装
+
+- 専用のMapperクラスを作成して変換ロジックを分離
+- 静的メソッドとして`to_domain`、`to_db`、`to_domain_list`を実装
+- 型安全性を保つために適切な型ヒントを付与
+- 変換時のエラーを適切に処理
+- リポジトリからMapperをインポートして使用
+
+### データベース操作
+
+- 必要最小限のカラムのみ取得
+- 複雑なクエリは分割して実装
+- パフォーマンスを考慮したクエリ設計
+- 実際のORM操作を直接実装（抽象化しない）

@@ -1,6 +1,5 @@
 ---
-description: バックエンド（FastAPI）のエラーハンドリングと例外処理のルール
-globs: ["**/*.py"]
+globs: app/backend/src/**/*.py
 alwaysApply: false
 ---
 # バックエンド (FastAPI): エラーハンドリングと例外処理
@@ -94,10 +93,13 @@ async def execute(self, request: FindUserRequest) -> User:
     try:
         return await self._user_repository.find_by_id(request.user_id)
     except (ExpectedBusinessError, ExpectedTechnicalError) as e:
-        logger.info(
-            e.code,
-            raw_message=e.raw_message,
-            details=e.details,
+        logger.error(
+            "ユーザー検索に失敗しました",
+            extra={
+                "error_code": e.code,
+                "raw_message": e.raw_message,
+                "details": e.details,
+            },
         )
         raise ExpectedUseCaseError(code=e.code, details=e.details) from e
 ```

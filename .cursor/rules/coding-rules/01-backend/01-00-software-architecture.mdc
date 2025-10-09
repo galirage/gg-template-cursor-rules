@@ -1,77 +1,98 @@
 ---
-description: バックエンド（FastAPI）のアーキテクチャ概要とドメイン駆動設計 (DDD) に基づく構造ルール
-globs: ["**/*.py"]
+globs: app/backend/src/**/*.py
 alwaysApply: false
 ---
 
 # バックエンド (FastAPI): ソフトウェアアーキテクチャ
 
-バックエンドのソフトウェアアーキテクチャとドメイン駆動設計のルールです。
+バックエンドのソフトウェアアーキテクチャに関するのルールです。
 プロジェクト構造・設計・実装時に以下のルールに従ってください。
 
-## アーキテクチャパターン
-バックエンドのアーキテクチャは **オニオンアーキテクチャ** を採用する。  
-※ わかりやすさのため `ApplicationService` を **UseCase** と呼ぶ。
+## アーキテクチャ
+バックエンドのアーキテクチャは**オニオンアーキテクチャ**を採用する。  
+※ わかりやすさのため**Application/Service**を**UseCase**と呼ぶ。
 
 ### レイヤー構成
 ```
-┌─────────────────────────┐
-│  Presentation Layer     │ ← API（HTTP）
-├─────────────────────────┤
-│  UseCase Layer          │ ← アプリケーション/ビジネスロジック
-├─────────────────────────┤
-│  Domain Layer           │ ← ドメインモデル（純粋ロジック）
-├─────────────────────────┤
-│  Infrastructure Layer   │ ← DB, 外部API,　ローカルストレージへのアクセス
-└─────────────────────────┘
+┌──────────────────────┐
+│ Presentation Layer   │← APIエンドポイント
+├──────────────────────┤
+│ UseCase Layer        │← ビジネスロジック
+├──────────────────────┤
+│ Domain Layer         │← ドメインモデル
+├──────────────────────┤
+│ Infrastructure Layer │← DB, 外部API, ローカルストレージへのアクセス
+└──────────────────────┘
 ```
 
 ## ディレクトリ構造
 ```
-src/backend/
+app/backend/src/
 ├── domain/                       # ドメイン層（外部に依存しない）
 │   └── user/                     # ユーザー集約
 │       ├── user.py               # エンティティ
 │       ├── id.py                 # 値オブジェクト
+│       ├── email_address.py      # 値オブジェクト
+│       ├── name.py               # 値オブジェクト
+│       ├── role.py               # 値オブジェクト
 │       └── repository.py         # リポジトリインターフェース
 ├── usecase/                      # ユースケース層（アプリケーションサービス）
 │   └── user/
-│       └── create_user.py        # 例：ユースケース
-├── infrastructure/               # インフラ層（外部I/Oの具体実装）
-│   ├── repository/               # リポジトリ実装
-│   │   └── user_repository_impl.py
-│   └── sqlalchemy_models.py      # ORM モデル（SQLAlchemy 等）
+│       ├── create_user_usecase.py  # ユースケース
+│       ├── delete_user_usecase.py  # ユースケース
+│       ├── find_user_usecase.py    # ユースケース
+│       └── filter_user_usecase.py  # ユースケース
+├── infrastructure/  # インフラ層（外部I/Oの具体実装）
+│   ├── repository/  # リポジトリ実装
+│   │   └── user/
+│   │       └── user_repository_impl.py
+│   ├── mapper/                   # ドメインとDBモデルの変換
+│   │   └── user_mapper.py
+│   └── models/                   # DBモデル
+│       └── users.py
 ├── presentation/                 # プレゼンテーション層（外界との接点）
-│   └── api/                      # FastAPI ルータ/ハンドラ
-│       ├── routers/              # APIRouter によるエンドポイント定義
-│       └── schemas/              # I/O DTO（Pydantic BaseModel）
+│   └── api/                      # FastAPIルータ/ハンドラ
+│       ├── routes/               # APIRouterによるエンドポイント定義
+│       │   ├── route.py          # メインルータ
+│       │   └── user.py           # ユーザールータ
+│       └── schema/               # I/O DTO（Pydantic BaseModel）
+│           ├── error_response.py # エラーレスポンススキーマ
+│           └── user/             # ユーザー関連スキーマ
+│               ├── create_user_request.py
+│               ├── create_user_response.py
+│               ├── find_user_request.py
+│               ├── find_user_response.py
+│               ├── delete_user_request.py
+│               ├── delete_user_response.py
+│               ├── filter_user_response.py
+│               └── user.py
 └── main.py                       # アプリケーションエントリポイント（FastAPI起動）
 ```
 
 ## DDD に基づく構造ルール
 
-### ドメイン層（`src/backend/domain/`）
+### ドメイン層（`app/backend/src/domain/`）
 他の層に依存しないコアロジック。ドメインオブジェクト（エンティティ、値オブジェクト、ドメインイベント）を配置。
 
-- **配置するもの**：エンティティ、値オブジェクト、ドメインイベント、ドメインサービス、抽象リポジトリ
 - **禁止事項**：I/O処理、フレームワーク依存、ORMなどの技術詳細
+- **配置するもの**：エンティティ、値オブジェクト、ドメインイベント、ドメインサービス、抽象リポジトリ
 - **原則**：純粋なビジネスルールのみを実装し、外部ライブラリへの依存を最小化
 
-### ユースケース層/アプリケーション層（`src/backend/usecase/`）
+### ユースケース層/アプリケーション層（`app/backend/src/usecase/`）
 ドメイン層とインフラ層のインターフェースを利用してアプリケーション固有ロジックを実装。他レイヤーの詳細に依存しない。
 
 - **責務**：アプリケーション固有のユースケースの調停（トランザクション境界の定義、ドメイン呼び出し、整合性の担保）
 - **依存関係**：ドメインの抽象インターフェースにのみ依存（具体実装は知らない）
 - **制約**：入出力のシリアライズやHTTP変換は扱わない（Presentation層に委譲）
 
-### インフラ層（`src/backend/infrastructure/`）
+### インフラ層（`app/backend/src/infrastructure/`）
 ドメイン層のインターフェース（例：Repository）を実装。外部システムとの連携（DB、API、ファイルシステム）。
 
 - **責務**：ドメインの抽象インターフェースの具体実装、外部システムとの連携
 - **配置するもの**：ORMモデル、外部APIクライアント、リポジトリ実装、マイグレーション補助
 - **原則**：外部サービス仕様の変更をこの層で吸収し、内側への影響を防ぐ
 
-### プレゼンテーション層（`src/backend/presentation/`）
+### プレゼンテーション層（`app/backend/src/presentation/`）
 APIエンドポイント。ユースケース層を呼び出し、結果を整形。DIコンテナの構成などもここで行う。
 
 - **責務**：外部インターフェース（HTTP API）の提供、ユースケースの呼び出し

@@ -1,6 +1,5 @@
 ---
-description: バックエンド（FastAPI）で使用する技術スタック
-globs: ["**/*.py"]
+globs: app/backend/**/*.py
 alwaysApply: false
 ---
 
@@ -8,13 +7,17 @@ alwaysApply: false
 
 ## 技術スタック一覧
 
-| 技術        | 用途               | 公式ドキュメント |
-|-------------|--------------------|--------------------|
-| Python      | プログラミング言語 | https://docs.python.org/3/ |
-| FastAPI     | Webフレームワーク  | https://fastapi.tiangolo.com/ |
-| SQLAlchemy  | データベース ORM   | https://docs.sqlalchemy.org/ |
-| PostgreSQL  | データベース       | https://www.postgresql.org/docs/ |
-| uv          | パッケージマネージャー | https://docs.astral.sh/uv/ |
+| 技術        | バージョン | 用途 | 備考 | 公式URL |
+|-------------|------------|------|------|---------|
+| Python | 3.12–3.13 | プログラミング言語 | 3.14 はpre-releaseのため対象外とする。 | https://www.python.org/downloads/ |
+| uv | ~=0.8.0 | パッケージマネージャー | Python用高速パッケージマネージャ。コマンドやオプションの違いがあるため、最新版を採用する。 | https://docs.astral.sh/uv/ |
+| FastAPI | ~=0.118.0 | Web フレームワーク | 高速かつ非同期対応であり、型安全性と自動ドキュメント生成により保守性と品質が高い。 | https://fastapi.tiangolo.com/ |
+| Pydantic | ~=2.11.0 | データバリデーション | FastAPIで推奨されている。v2系は高速化されており、FastAPIもv0.100 以降でv2をサポートする。 | https://docs.pydantic.dev/ |
+| pytest | ~=8.4.0 | テストフレームワーク | 必ずテストコードを実装し、品質を担保するために使用する。 | https://docs.pytest.org/ |
+| httpx | ~=0.28.0 | HTTP クライアント | テストでのAPIアクセスに使用する。 | https://www.python-httpx.org/ |
+| pytest-cov | ~=7.0.0 | カバレッジの測定 | テストカバレッジを見える化し、テスト漏れを防ぐために使用する。 | https://pytest-cov.readthedocs.io/en/latest/ |
+| pyright | ~=1.1.0 | 静的型チェッカー | 実行前に型エラーを検出してバグを未然に防ぎ、FastAPIの型安全なコード品質を確保する。 | https://microsoft.github.io/pyright/ |
+| ruff | ~=0.13.0 | リンター/フォーマッター | ruff format / ruff checkでスタイルと品質を統一する。 | https://docs.astral.sh/ruff/ |
 
 ## バージョン情報
 

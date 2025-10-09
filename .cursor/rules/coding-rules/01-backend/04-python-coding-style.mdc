@@ -1,13 +1,12 @@
 ---
-description: バックエンド（FastAPI）固有のコーディングスタイルと命名規則
-globs: ["**/*.py"]
+globs: app/backend/**/*.py
 alwaysApply: false
 ---
 
 # バックエンド (FastAPI): コーディングスタイル
 
 Python バックエンド固有のコーディングスタイルルールです。
-`../00-common/01-coding-style.mdc` よりもさらに詳細なコーディングルールについて記載しています。
+`../00-common/00-common-rules.mdc` よりもさらに詳細なコーディングルールについて記載しています。
 
 ## Python固有の命名規則
 
@@ -16,7 +15,6 @@ Python バックエンド固有のコーディングスタイルルールです�
 - **クラス名**: `PascalCase` を使用  
 - **定数**: `ALL_CAPS_WITH_UNDERSCORES` を使用
 - **プライベート属性**: 先頭に `_` を付与（例: `_private_method`）
-- **特別なプライベート属性**: 先頭に `__` を付与（例: `__very_private`）
 
 ### 具体例
 ```python
@@ -28,7 +26,7 @@ class UserService:
         self._db_connection = None
         self.__internal_state = {}
     
-    def calculate_total_amount(self, items: List[Item]) -> int:
+    def calculate_total_amount(self, items: list[Item]) -> int:
         return sum(item.price for item in items)
     
     def _validate_user_data(self, data: dict) -> bool:
@@ -46,19 +44,32 @@ class userService:  # クラス名がsnake_case
 
 ### 基本的な使用方法
 - すべての関数に**引数と戻り値の型**を明示する
-- `typing` モジュールを活用して複雑な型を表現する
-- `Optional` や `Union` を適切に使い分ける
+- Python 3.12+ の新しい型ヒント構文を使用する
 
 ### 具体例
 ```python
-from typing import Optional, List, Dict, Union
-from datetime import datetime
+from datetime import UTC, datetime
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import ClassVar
+
+class RoleEnum(str, Enum):
+    ADMIN = "admin"
+    MEMBER = "member"
+
+@dataclass(eq=False, slots=True)
+class User:
+    id: str
+    name: str
+    email: str
+    role: RoleEnum = field(default=RoleEnum.MEMBER)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 def process_users(
-    users: List[User], 
-    created_at: Optional[datetime] = None,
-    filters: Dict[str, Union[str, int]] = None
-) -> Dict[str, int]:
+    users: list[User], 
+    created_at: datetime | None = None,
+    filters: dict[str, str | int] | None = None
+) -> dict[str, int]:
     """ユーザーデータを処理する。
     
     Args:
@@ -77,7 +88,7 @@ def process_users(
 
 # クラスメソッドの型ヒント
 class UserRepository:
-    def find_by_id(self, user_id: int) -> Optional[User]:
+    def find_by_id(self, user_id: int) -> User | None:
         # 実装
         pass
     
@@ -86,47 +97,163 @@ class UserRepository:
         pass
 ```
 
-## インポート文の整理
+## コメントの書き方
 
-### 基本方針
-**Ruffのisort機能を使用してインポート文を自動整理する**
+### モジュールレベルのdocstring
 
-手動でインポート順序を管理する必要はありません。以下のコマンドで自動的にPEP 8準拠の順序に整理されます。
+ファイルの先頭にモジュールの目的を記載します。
 
-### 自動整理コマンド
-```bash
-# インポート文のみを整理
-uv run ruff check . --select I --fix
-
-# 全体のフォーマット（インポート含む）
-uv run ruff format .
-
-# 全体のリンターチェック（インポート含む）
-uv run ruff check . --fix
-```
-
-### 自動整理される順序
-Ruffが以下の順序で自動整理します：
-1. **標準ライブラリ** (datetime, typing, os など)
-2. **サードパーティライブラリ** (fastapi, sqlalchemy など)
-3. **ファーストパーティ** (src.* など、自分のプロジェクト)
-
-各グループ間は自動的に空行で区切られます。
-
-### 設定
-`pyproject.toml`で設定済み：
-```toml
-[tool.ruff.lint.isort]
-known-first-party = ["src"]
-```
-
-### 避けるべきパターン
 ```python
-# ❌ 避ける: ワイルドカードインポート
-from typing import *
+"""ユーザー検索ユースケース。
 
-# ❌ 避ける: 不要なインポート
-import os  # 使用していない場合
+IDでユーザーを検索するビジネスロジックを実装する。
+"""
+
+from src.domain.user.repository import UserRepository
+# 以降のコード
 ```
 
-**注意**: インポート順序は手動で管理せず、必ずformatterに任せてください。
+### クラスレベルのdocstring
+
+クラス定義の直後にクラスの目的と責務を記載します。
+
+```python
+class UserRepositoryImpl(UserRepository):
+    """PostgreSQLを使用したユーザーリポジトリの実装。
+
+    Piccolo ORMを使用してユーザーの永続化操作を行う。
+    """
+
+    async def find_by_id(self, user_id: UserId) -> User:
+        # メソッドの実装
+        pass
+```
+
+### メソッドレベルのdocstring（Google形式）
+
+すべてのメソッドにGoogle形式のdocstringを記載します。
+
+```python
+async def find_by_id(self, user_id: UserId) -> User:
+    """IDでユーザーを検索する。
+
+    Args:
+        user_id: 検索するユーザーID
+
+    Returns:
+        見つかったユーザー
+
+    Raises:
+        ExpectedBusinessError: ユーザーが見つからない場合
+
+    """
+    user = await UserModel.select().where(UserModel.id == user_id.value).first()
+
+    if user is None:
+        raise ExpectedBusinessError(
+            code=UserErrorCode.NotFound,
+            details={"user_id": user_id.value},
+        )
+
+    return UserMapper.to_domain(user)
+```
+
+### インラインコメント
+
+処理の意図や仕様変更時の注意点を記載します。
+
+```python
+async def save(self, user: User) -> User:
+    """ユーザーを保存する。"""
+    try:
+        db_data = UserMapper.to_db(user)
+        await UserModel.insert(
+            UserModel(
+                id=db_data["id"],
+                email=db_data["email"],
+                role=db_data["role"],
+                name=db_data["name"],
+            ),
+        )
+    except Exception as e:
+        # メールアドレスの一意制約違反の場合、ビジネスエラーに変換
+        if "email" in str(e).lower():
+            raise ExpectedBusinessError(
+                code=UserErrorCode.EmailAlreadyExists,
+                details={"email": user.email.value},
+            ) from e
+        raise
+    return user
+```
+
+### バリデーションのdocstring
+
+値オブジェクトのバリデーションメソッドにも記載します。
+
+```python
+@dataclass(frozen=True, slots=True)
+class EmailAddress:
+    """メールアドレスを表現する値オブジェクト。
+
+    メールアドレスの構文検証を行い、有効なメールアドレスのみを許可する。
+    """
+
+    value: str
+
+    def __post_init__(self) -> None:
+        """メールアドレスの構文検証を行う。
+
+        Raises:
+            ValueError: メールアドレスの構文が無効な場合
+
+        """
+        try:
+            validate_email(self.value, check_deliverability=False)
+        except Exception as e:
+            raise ValueError(f"invalid email address, email: {self.value}") from e
+
+    @staticmethod
+    def random() -> "EmailAddress":
+        """テスト用のランダムなメールアドレスを生成する。
+
+        Returns:
+            ランダムなメールアドレス
+
+        """
+        return EmailAddress(f"test{uuid.uuid4()}@galirage.com")
+```
+
+### コメント記述のベストプラクティス
+
+#### ✅ 良い例
+
+```python
+# ユーザーが見つからない場合はビジネスエラーを発生
+if user is None:
+    raise ExpectedBusinessError(code=UserErrorCode.NotFound)
+
+# UserModel.objects() の結果をdictのリストに変換
+user_dicts = [user.to_dict() for user in users]
+
+# 管理者は特定のメール形式でないと作成できない
+if not email.endswith("@admin.company.com"):
+    raise ValueError("管理者は@admin.company.comドメインのメールが必要です")
+```
+
+#### ❌ 悪い例
+
+```python
+# NG: 処理内容をそのままなぞるだけのコメント
+# user_idでユーザーを検索する
+user = await UserModel.select().where(UserModel.id == user_id.value).first()
+
+# NG: 冗長なコメント
+# ユーザーをループして処理する
+for user in users:
+    process(user)
+
+# NG: コメントで複雑なロジックを説明（ロジックを改善すべき）
+# まずAをチェックして、次にBを確認し、最後にCの条件を...
+if complex_condition:
+    pass
+```

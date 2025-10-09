@@ -1,13 +1,12 @@
 ---
-description: バックエンド（FastAPI）のテスト実装と品質保証のためのルール
-globs: packages/core-api/tests/**.py
+globs: app/backend/tests/**/*.py
 alwaysApply: false
 ---
 # バックエンドテスト実装ルール
 
 ## 概要
 
-このドキュメントは、プロジェクトのバックエンドにおけるテストコード実装のガイドラインです。
+このドキュメントは、バックエンドのテストコード実装のガイドラインです。
 
 ## テスト戦略の全体構成
 
@@ -26,20 +25,20 @@ alwaysApply: false
   - バグ修正にはユニットテストを追加すること
   - 実装後は必ずテストを実行し、テストが失敗した場合はテストを修正すること
     - `uv run --frozen pytest -v --tb=short --cov=src --cov-report=term`で実行
-  - テスト実装後にruff, tyを実行すること
+  - テスト実装後にruff, pyrightを実行すること
     - `uv run ruff check .`
-    - `uv run ruff linter .`
-    - `uv run ty check .`
+    - `uv run ruff format --check .`
+    - `uv run pyright .`
 
 ### 1.2 対象とスコープ
 
-#### テスト対象
+#### 単体テスト対象
 
 ```python
 # ドメイン層（最重要）
 domain/
 ├── user/
-│   ├── __init__.py      # 不要
+│   ├── __init__.py      # テスト不要
 │   ├── user.py          # 必須(Entity)
 │   ├── id.py            # 必須(ValueObject)
 │   ├── email_address.py # 必須(ValueObject)
@@ -48,12 +47,12 @@ domain/
 # ユースケース層（重要）
 use_case/
 └── user/
-    ├── __init__.py           # 不要
+    ├── __init__.py           # テスト不要
     ├── save_user_usecase.py  # 必須
     └── find_user_usecase.py  # 必須
 ```
 
-#### テスト除外対象
+#### 単体テスト除外対象
 
 ```python
 # インフラ層（統合テストで検証）
@@ -226,7 +225,7 @@ class TestExecute:
 
 ### 1.4 テストケース(関数)の命名規則
 
-#### クラスによるテストケースのルーピング
+#### クラスによるテストケースのグルーピング
 
 - 各関数ごとに複数のテストケースを作成するため、テスト対象の関数名を元に `class Test{関数名}` のようにクラスでラップします。
 
