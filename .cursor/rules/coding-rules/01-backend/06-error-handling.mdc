@@ -1,8 +1,11 @@
 ---
-globs: app/backend/src/**/*.py
+globs: app/backend/**/*.py
 alwaysApply: false
 ---
-# バックエンド (FastAPI): エラーハンドリングと例外処理
+
+# エラーハンドリングと例外処理
+
+## 概要
 
 このドキュメントは、プロジェクトにおけるエラーハンドリングと例外処理の実装ガイドラインです。
 一貫性のあるエラー処理を実装するために参照してください。
@@ -11,7 +14,7 @@ alwaysApply: false
 
 ### 基本構造
 
-すべてのエラーは `BaseError` を継承し、以下の属性を持ちます：
+すべてのエラーは`BaseError`を継承し、以下の属性を持ちます：
 
 - `code`: エラーコード（ErrorCode型）
 - `raw_message`: 開発者向けの詳細メッセージ（オプション）
@@ -44,7 +47,7 @@ UnexpectedBusinessError
 
 ## エラーコードの定義
 
-エラーコードは `src/shared/errors/codes.py` で Enum として定義します：
+エラーコードは`src/shared/errors/codes.py`でEnumとして定義します：
 
 ```python
 class CommonErrorCode(str, Enum):
@@ -93,13 +96,10 @@ async def execute(self, request: FindUserRequest) -> User:
     try:
         return await self._user_repository.find_by_id(request.user_id)
     except (ExpectedBusinessError, ExpectedTechnicalError) as e:
-        logger.error(
+        logger.info(
             "ユーザー検索に失敗しました",
-            extra={
-                "error_code": e.code,
-                "raw_message": e.raw_message,
-                "details": e.details,
-            },
+            raw_message=e.raw_message,
+            details=e.details,
         )
         raise ExpectedUseCaseError(code=e.code, details=e.details) from e
 ```
@@ -172,19 +172,16 @@ class UserName:
 
 ## ログ出力
 
-### structlogを使用した構造化ログ
+### 構造化ログの使用
 
 ```python
-import structlog
+from src.log.logger import logger
 
-logger = structlog.get_logger()
-
-# エラーログの出力
 logger.error(
-    "user_not_found",
+    "ユーザーが見つかりません",
     user_id=user_id.value,
     error_code=UserErrorCode.NotFound.value,
-    exc_info=True,  # スタックトレースを含める
+    exc_info=True,
 )
 ```
 

@@ -1,12 +1,12 @@
 ---
-globs: app/backend/tests/**/*.py
+globs: app/backend/tests/**.py
 alwaysApply: false
 ---
 # バックエンドテスト実装ルール
 
 ## 概要
 
-このドキュメントは、バックエンドのテストコード実装のガイドラインです。
+このドキュメントは、プロジェクトのバックエンドにおけるテストコード実装のガイドラインです。
 
 ## テスト戦略の全体構成
 
@@ -19,20 +19,13 @@ alwaysApply: false
 - テストツール
   - pytest
 - 単体テスト実装方針:
-  - 非同期テストは `asyncio` ではなく `anyio` を使用
-  - カバレッジはエッジケースやエラーも含めてテストすること
+  - 非同期テストは`asyncio`ではなく`anyio`を使用
   - 新機能には必ずテストを追加すること
-  - バグ修正にはユニットテストを追加すること
-  - 実装後は必ずテストを実行し、テストが失敗した場合はテストを修正すること
-    - `uv run --frozen pytest -v --tb=short --cov=src --cov-report=term`で実行
-  - テスト実装後にruff, pyrightを実行すること
-    - `uv run ruff check .`
-    - `uv run ruff format --check .`
-    - `uv run pyright .`
+  - バグ修正時には、そのバグが再発しないことを確認するためのテストを追加すること
 
 ### 1.2 対象とスコープ
 
-#### 単体テスト対象
+#### テスト対象
 
 ```python
 # ドメイン層（最重要）
@@ -52,17 +45,16 @@ use_case/
     └── find_user_usecase.py  # 必須
 ```
 
-#### 単体テスト除外対象
+#### テスト除外対象
 
 ```python
 # インフラ層（統合テストで検証）
 infrastructure/
-├── repository/         # 単体テスト対象外(リポジトリは結合テストで検証)
-└── piccolo_models.py   # 単体テスト対象外(ORMモデルは結合テストで検証)
+├── repository/         # 単体テスト対象外とし、リポジトリは結合テストで検証
 
 # プレゼンテーション層（契約テストで検証）
 presentation/
-└── api/                # 単体テスト対象外(契約テストで検証)
+└── api/                # 単体テスト対象外とし、契約テストで検証
 ```
 
 ### 1.3 実装例
@@ -185,7 +177,7 @@ def mock_user_repository() -> AsyncMock:
 
 
 class TestExecute:
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_OK(self, mock_user_repository: AsyncMock) -> None:
         # arrange
         user_id = str(uuid4())
@@ -206,7 +198,7 @@ class TestExecute:
         assert result == test_user
         mock_user_repository.find_by_id.assert_called_once_with(UserId(value=user_id))
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_NG_ユーザーが存在しない場合はExpectedUseCaseErrorを返すこと(
         self, mock_user_repository: AsyncMock
     ) -> None:
@@ -227,7 +219,7 @@ class TestExecute:
 
 #### クラスによるテストケースのグルーピング
 
-- 各関数ごとに複数のテストケースを作成するため、テスト対象の関数名を元に `class Test{関数名}` のようにクラスでラップします。
+- 各関数ごとに複数のテストケースを作成するため、テスト対象の関数名を元に`class Test{関数名}`のようにクラスでラップします。
 
 ```python
 class TestChat:
@@ -237,8 +229,8 @@ class TestChat:
 
 #### 正常系テスト
 
-- 正常系の基本テストは `def test_OK(self):` と命名します。
-- 同じ関数の正常系で複数のテストケースがある場合は、`test_OK_{テストする内容}` と追記して明示します。
+- 正常系の基本テストは`def test_OK(self):`と命名します。
+- 同じ関数の正常系で複数のテストケースがある場合は、`test_OK_{テストする内容}`と追記して明示します。
 
 ```python
 class TestChat:
@@ -295,16 +287,15 @@ def test_NG(email_address: str) -> None:
 
 #### スキーマ定義
 
-- スキーマ定義は `presentation/api/schema` 以下に配置します。
-- スキーマ定義は `pydantic` を使用して定義します。
-- スキーマ定義は `pydantic` の `BaseModel` を継承して定義します。
-- スキーマ定義は `pydantic` の `Field` を使用してフィールドを定義します。
-- スキーマ定義は `pydantic` の `Literal` を使用してフィールドの型を定義します。
-- スキーマ定義は `pydantic` の `Annotated` を使用してフィールドの型を定義します。
-- Nullバイトを許可しないようにするため、`SafeStr` を使用してフィールドの型を定義します。
+- スキーマ定義は`presentation/api/schema`以下に配置します。
+- スキーマ定義は`pydantic`を使用して定義します。
+- スキーマ定義は`pydantic`の`BaseModel`を継承して定義します。
+- スキーマ定義は`pydantic`の`Field`を使用してフィールドを定義します。
+- スキーマ定義は`pydantic`の`Literal`を使用してフィールドの型を定義します。
+- スキーマ定義は`pydantic`の`Annotated`を使用してフィールドの型を定義します。
+- Nullバイトを許可しないようにするため、`SafeStr`を使用してフィールドの型を定義します。
 
 ```python
-# presentation/api/schema/user/create_user_request.py
 from datetime import datetime
 from typing import Annotated, Literal
 
@@ -322,27 +313,4 @@ class User(BaseModel):
     name: Annotated[SafeStr, Field(description="ユーザー名")]
     created_at: datetime = Field(description="作成日時")
 
-```
-
-### 2.3 Schemathesisテスト実装
-
-- `tests/contract/test_api_contracts.py` を参照
-
-## 3. よく使うテスト実行コマンド
-
-```bash
-# 全テスト実行
-uv run pytest
-
-# カバレッジ付きでテスト実行
-uv run pytest --cov=src --cov-report=term
-
-# 特定のファイルのテスト実行
-pytest tests/test_user.py
-
-# テスト失敗時に詳細表示して停止
-pytest -v -x
-
-# 前回失敗したテストのみ実行
-pytest --lf
 ```

@@ -9,7 +9,8 @@ alwaysApply: false
 プレゼンテーション層の実装ルールを記載します。
 新しいエンドポイントを実装する際は、このルールに従ってください。
 
-> **注記**: このドキュメントのサンプルコードでは、文章量削減のためコメントを省略しています。実際の実装では、`04-python-coding-style.mdc`に従ってdocstringとインラインコメントを必ず記載してください。
+> **注記**: このドキュメントのサンプルコードでは、文章量削減のためコメントを省略しています。
+> 実際の実装では、`04-python-coding-style.mdc`に従ってdocstringとインラインコメントを必ず記載してください。
 
 ## 1. ディレクトリ構造
 
@@ -130,19 +131,21 @@ class User(BaseModel):
 ### エラーレスポンス
 
 ```python
+from pydantic import BaseModel, Field
+
 class ErrorResponse(BaseModel):
-    message: Annotated[
+    detail: Annotated[
         str,
         Field(description="クライアントに表示するエラーメッセージ"),
     ]
 
 class ValidationErrorResponse(BaseModel):
-    message: Annotated[
+    detail: Annotated[
         str,
         Field(description="バリデーションエラーメッセージ"),
     ]
-    details: Annotated[
-        list[dict],
+    errors: Annotated[
+        dict[str, list[str]],
         Field(description="バリデーションエラーの詳細"),
     ]
 ```

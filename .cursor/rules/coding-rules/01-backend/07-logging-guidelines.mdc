@@ -1,82 +1,19 @@
 ---
-globs: app/backend/src/**/*.py
+globs: app/backend/**/*.py
 alwaysApply: false
 ---
-
-# バックエンド (FastAPI): ログ実装方針
-
-バックエンド開発におけるログ実装方針に関するルールです。
-ログの実装・デバッグ・運用監視時に以下のルールに従ってください。
+# ログ実装ガイドライン
 
 ## 基本方針
 
-このシステムでは `print()` を使用せず、構造化ログを使用する。
-
-#### 出力例
-```json
-{
-  "event": "ユーザー作成完了",
-  "level": "info", 
-  "user_id": 12345,
-  "email": "user@example.com",
-  "timestamp": "2023-01-01T10:00:00Z",
-  "logger": "user_service"
-}
-```
-
-#### 使用ライブラリ
-- **structlog**: 構造化ログライブラリ
-
-### ログ設定ファイル（想定）
-
-```python
-# src/infrastructure/config/logging/log.py
-import structlog
-import sys
-from datetime import datetime
-from typing import Any
-
-# 構造化ログの設定
-structlog.configure(
-    processors=[
-        structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.JSONRenderer()
-    ],
-    wrapper_class=structlog.stdlib.BoundLogger,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    context_class=dict,
-    cache_logger_on_first_use=True,
-)
-
-logger = structlog.get_logger()
-
-# ユーティリティ関数例
-def log_user_action(action: str, user_id: int, **kwargs: Any):
-    logger.info(
-        action,
-        user_id=user_id,
-        **kwargs
-    )
-
-def log_error_with_context(error: Exception, context: dict):
-    logger.error(
-        "システムエラー",
-        error_type=type(error).__name__,
-        error_message=str(error),
-        **context
-    )
-```
+このシステムでは`print()`を使用せず、`src/log/logger.py`の構造化ログを使用する。
 
 ## ログの使用方法
 
 ### 1. loggerのインポート
 
 ```python
-from src.infrastructure.config.logging.log import logger
+from src.log.logger import logger
 ```
 
 ### 2. ログレベルの使い分け
@@ -95,48 +32,23 @@ logger.warning("データベーステーブルクリーンアップ失敗", tabl
 logger.error("ユーザー保存エラー", user_id=user.id.value, error=str(e))
 ```
 
-## 禁止事項と推奨事項
+## 禁止事項
 
-### ❌ print()の使用（禁止）
+### print()の使用
 
 ```python
-# NG: print() を使用しない
-print(f"Warning: Could not clean table {table_name}: {e}")
-print("ユーザー作成完了")  # 構造化されていない
-
-# NG: 文字列の連結
-print(f"User {user_id} created with email {email}")
+# NG
+print(f"警告: テーブル {table_name} のクリーンアップ失敗: {e}")
 ```
 
-**禁止理由:**
-- ログ管理の困難（出力先が標準出力のみ）
-- 構造化されていない（検索・分析が困難）
-- ログレベルがない（重要度の区別ができない）
-- 本番環境での問題（スケールした際のログ集約が困難）
-
-### ✅ 構造化ログの使用（推奨）
+### loggerの使用
 
 ```python
-# OK: 構造化ログを使用
+# OK
 logger.warning(
-    "Could not clean table during test setup",
+    "テストセットアップ中のテーブルクリーンアップ失敗",
     table_name=table_name,
     error=str(e)
 )
-
-# OK: ユーザーアクション
-logger.info(
-    "ユーザー作成完了",
-    user_id=user.id.value,
-    email=user.email.value,
-    created_at=datetime.utcnow().isoformat()
-)
-
-# OK: エラーコンテキスト付き
-logger.error(
-    "データベース接続エラー",
-    database_url="postgresql://...",
-    retry_count=3,
-    error_type=type(e).__name__
-)
 ```
+

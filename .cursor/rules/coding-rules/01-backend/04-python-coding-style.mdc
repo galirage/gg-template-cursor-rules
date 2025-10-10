@@ -5,97 +5,22 @@ alwaysApply: false
 
 # バックエンド (FastAPI): コーディングスタイル
 
-Python バックエンド固有のコーディングスタイルルールです。
-`../00-common/00-common-rules.mdc` よりもさらに詳細なコーディングルールについて記載しています。
+Pythonバックエンド固有のコーディングスタイルルールです。
+`.cursor/rules/coding-rules/00-common/00-common-rules.mdc` よりもさらに詳細なコーディングルールについて記載しています。
 
 ## Python固有の命名規則
 
 ### 基本的な命名パターン
-- **変数・関数名**: `snake_case` を使用
-- **クラス名**: `PascalCase` を使用  
-- **定数**: `ALL_CAPS_WITH_UNDERSCORES` を使用
-- **プライベート属性**: 先頭に `_` を付与（例: `_private_method`）
-
-### 具体例
-```python
-# ✅ 良い例
-class UserService:
-    MAX_RETRY_COUNT = 3
-    
-    def __init__(self):
-        self._db_connection = None
-        self.__internal_state = {}
-    
-    def calculate_total_amount(self, items: list[Item]) -> int:
-        return sum(item.price for item in items)
-    
-    def _validate_user_data(self, data: dict) -> bool:
-        return all(key in data for key in ['name', 'email'])
-
-# ❌ 悪い例
-class userService:  # クラス名がsnake_case
-    maxRetryCount = 3  # 定数がcamelCase
-    
-    def calculateTotalAmount(self, items):  # 関数名がcamelCase
-        return sum(item.price for item in items)
-```
+- **変数・関数名**: `snake_case`を使用
+- **クラス名**: `PascalCase`を使用  
+- **定数**: `ALL_CAPS_WITH_UNDERSCORES`を使用
+- **プライベート属性**: 先頭に`_`を付与（例: `_private_method`）
 
 ## 型ヒント・アノテーション
 
 ### 基本的な使用方法
 - すべての関数に**引数と戻り値の型**を明示する
-- Python 3.12+ の新しい型ヒント構文を使用する
-
-### 具体例
-```python
-from datetime import UTC, datetime
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import ClassVar
-
-class RoleEnum(str, Enum):
-    ADMIN = "admin"
-    MEMBER = "member"
-
-@dataclass(eq=False, slots=True)
-class User:
-    id: str
-    name: str
-    email: str
-    role: RoleEnum = field(default=RoleEnum.MEMBER)
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-
-def process_users(
-    users: list[User], 
-    created_at: datetime | None = None,
-    filters: dict[str, str | int] | None = None
-) -> dict[str, int]:
-    """ユーザーデータを処理する。
-    
-    Args:
-        users: 処理対象のユーザーリスト
-        created_at: 作成日時フィルター（任意）
-        filters: 追加フィルター条件（任意）
-    
-    Returns:
-        処理結果のサマリー辞書
-    """
-    if filters is None:
-        filters = {}
-    
-    # 処理ロジック
-    return {"processed": len(users), "filtered": 0}
-
-# クラスメソッドの型ヒント
-class UserRepository:
-    def find_by_id(self, user_id: int) -> User | None:
-        # 実装
-        pass
-    
-    def save(self, user: User) -> User:
-        # 実装
-        pass
-```
+- Python 3.12+ の構文を使用する
 
 ## コメントの書き方
 
@@ -110,23 +35,20 @@ IDでユーザーを検索するビジネスロジックを実装する。
 """
 
 from src.domain.user.repository import UserRepository
-# 以降のコード
+# ...
 ```
 
 ### クラスレベルのdocstring
 
-クラス定義の直後にクラスの目的と責務を記載します。
+クラス定義の直後にクラスの目的を記載します。
 
 ```python
-class UserRepositoryImpl(UserRepository):
-    """PostgreSQLを使用したユーザーリポジトリの実装。
+@dataclass
+class User:
+    """システム利用者を表すドメインモデル。
 
-    Piccolo ORMを使用してユーザーの永続化操作を行う。
+    ユーザーの基本情報と認証情報を保持し、ユーザーに関するビジネスルールを実装する。
     """
-
-    async def find_by_id(self, user_id: UserId) -> User:
-        # メソッドの実装
-        pass
 ```
 
 ### メソッドレベルのdocstring（Google形式）
@@ -186,43 +108,6 @@ async def save(self, user: User) -> User:
     return user
 ```
 
-### バリデーションのdocstring
-
-値オブジェクトのバリデーションメソッドにも記載します。
-
-```python
-@dataclass(frozen=True, slots=True)
-class EmailAddress:
-    """メールアドレスを表現する値オブジェクト。
-
-    メールアドレスの構文検証を行い、有効なメールアドレスのみを許可する。
-    """
-
-    value: str
-
-    def __post_init__(self) -> None:
-        """メールアドレスの構文検証を行う。
-
-        Raises:
-            ValueError: メールアドレスの構文が無効な場合
-
-        """
-        try:
-            validate_email(self.value, check_deliverability=False)
-        except Exception as e:
-            raise ValueError(f"invalid email address, email: {self.value}") from e
-
-    @staticmethod
-    def random() -> "EmailAddress":
-        """テスト用のランダムなメールアドレスを生成する。
-
-        Returns:
-            ランダムなメールアドレス
-
-        """
-        return EmailAddress(f"test{uuid.uuid4()}@galirage.com")
-```
-
 ### コメント記述のベストプラクティス
 
 #### ✅ 良い例
@@ -232,7 +117,7 @@ class EmailAddress:
 if user is None:
     raise ExpectedBusinessError(code=UserErrorCode.NotFound)
 
-# UserModel.objects() の結果をdictのリストに変換
+# UserModel.objects()の結果をdictのリストに変換
 user_dicts = [user.to_dict() for user in users]
 
 # 管理者は特定のメール形式でないと作成できない
@@ -253,7 +138,7 @@ for user in users:
     process(user)
 
 # NG: コメントで複雑なロジックを説明（ロジックを改善すべき）
-# まずAをチェックして、次にBを確認し、最後にCの条件を...
+# Aをチェックして、次にBを確認...
 if complex_condition:
     pass
 ```

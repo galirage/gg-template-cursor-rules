@@ -5,7 +5,7 @@ alwaysApply: false
 
 # バックエンド (FastAPI): ソフトウェアアーキテクチャ
 
-バックエンドのソフトウェアアーキテクチャに関するのルールです。
+バックエンドのソフトウェアアーキテクチャに関するルールです。
 プロジェクト構造・設計・実装時に以下のルールに従ってください。
 
 ## アーキテクチャ
@@ -41,13 +41,11 @@ app/backend/src/
 │       ├── create_user_usecase.py  # ユースケース
 │       ├── delete_user_usecase.py  # ユースケース
 │       ├── find_user_usecase.py    # ユースケース
-│       └── filter_user_usecase.py  # ユースケース
+│       └── ...
 ├── infrastructure/  # インフラ層（外部I/Oの具体実装）
 │   ├── repository/  # リポジトリ実装
 │   │   └── user/
 │   │       └── user_repository_impl.py
-│   ├── mapper/                   # ドメインとDBモデルの変換
-│   │   └── user_mapper.py
 │   └── models/                   # DBモデル
 │       └── users.py
 ├── presentation/                 # プレゼンテーション層（外界との接点）
@@ -61,15 +59,13 @@ app/backend/src/
 │               ├── create_user_request.py
 │               ├── create_user_response.py
 │               ├── find_user_request.py
-│               ├── find_user_response.py
 │               ├── delete_user_request.py
-│               ├── delete_user_response.py
-│               ├── filter_user_response.py
+│               ├── ...
 │               └── user.py
 └── main.py                       # アプリケーションエントリポイント（FastAPI起動）
 ```
 
-## DDD に基づく構造ルール
+## DDDに基づく構造ルール
 
 ### ドメイン層（`app/backend/src/domain/`）
 他の層に依存しないコアロジック。ドメインオブジェクト（エンティティ、値オブジェクト、ドメインイベント）を配置。
@@ -104,7 +100,6 @@ APIエンドポイント。ユースケース層を呼び出し、結果を整�
 ### 依存関係の原則
 - **上位レイヤーは下位レイヤーに依存するが、逆は不可**（依存性の逆転は除く）
 - **内側の層は抽象インターフェースにのみ依存**（DIP：依存性逆転の原則）
-- 共有が必要な型や定数は`domain`または`usecase`側の抽象に寄せて提供する
 
 ### 各層の責務遵守
 - **各層の責務を逸脱しない**（例：ドメイン層にI/OやUIロジックを含めない）

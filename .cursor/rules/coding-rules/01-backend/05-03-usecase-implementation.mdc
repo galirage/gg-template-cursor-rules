@@ -9,7 +9,8 @@ alwaysApply: false
 ユースケース層の実装ルールを記載します。
 新しいユースケースを実装する際は、このルールに従ってください。
 
-> **注記**: このドキュメントのサンプルコードでは、文章量削減のためコメントを省略しています。実際の実装では、`04-python-coding-style.mdc`に従ってdocstringとインラインコメントを必ず記載してください。
+> **注記**: このドキュメントのサンプルコードでは、文章量削減のためコメントを省略しています。
+> 実際の実装では、`04-python-coding-style.mdc`に従ってdocstringとインラインコメントを必ず記載してください。
 
 ## 1. ディレクトリ構造
 
@@ -20,8 +21,8 @@ usecase/
 └── user/
     ├── __init__.py
     ├── delete_user_usecase.py
-    ├── filter_user_usecase.py
-    └── find_user_usecase.py
+    ├── create_user_usecase.py
+    └── ...
 ```
 
 ### 実装ルール
@@ -50,13 +51,10 @@ class DeleteUserUseCase:
             user = await self.user_repository.find_by_id(UserId(value=request.user_id))
             await self.user_repository.delete(user_id=user.id)
         except (ExpectedBusinessError, ExpectedTechnicalError) as e:
-            logger.error(
+            logger.info(
                 "ユーザー削除に失敗しました",
-                extra={
-                    "error_code": e.code,
-                    "raw_message": e.raw_message,
-                    "details": e.details,
-                }
+                raw_message=e.raw_message,
+                details=e.details,
             )
             raise ExpectedUseCaseError(code=e.code, details=e.details) from e
 
@@ -75,5 +73,5 @@ class DeleteUserUseCase:
 - `execute`メソッドでビジネスロジックを実装
 - データベースアクセスなどのI/O操作を効率的に処理するため、非同期メソッドとして定義（`async def`）
 - エラーハンドリングでリポジトリ層のエラーをユースケース層のエラーに変換
-- ログ出力は`logger.error`を使用し、構造化ログでエラー情報を記録（成功時は`logger.info`も使用可能）
+- 想定内エラーのログ出力は`logger.info`を使用し、構造化ログでエラー情報を記録（成功時も`logger.info`を使用可能）
 - 元の例外情報を保持するために、例外チェーンを保持（`raise NewError() from e`）
