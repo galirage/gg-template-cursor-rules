@@ -14,13 +14,9 @@ alwaysApply: true
 このプロジェクトはモノレポ構成を採用しており、フロントエンドとバックエンドを単一リポジトリで管理しています。
 
 ```
-├── app/
-│   ├── backend/        # バックエンド（FastAPI）
-│   └── frontend/       # フロントエンド（Next.js）
-├── docs/               # ドキュメント
-├── docker-compose.yml  # Docker Compose設定
-├── Taskfile.yaml       # タスクランナー設定
-└── README.md           # プロジェクト概要
+└── app/
+   ├── backend/  # バックエンド（FastAPI）
+   └── frontend/ # フロントエンド（Next.js）
 ```
 
 詳細なディレクトリ構成については、以下を参照してください：
