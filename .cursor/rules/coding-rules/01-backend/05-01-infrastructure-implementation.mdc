@@ -2,7 +2,7 @@
 globs: app/backend/src/infrastructure/**/*.py
 alwaysApply: false
 ---
-# インフラ実装ルール
+# インフラ層実装ルール
 
 ## 概要
 
@@ -14,31 +14,30 @@ alwaysApply: false
 
 ## 1. ディレクトリ構造
 
+### 例：userリポジトリの実装
 ```
 infrastructure/
-├── repository/
-│   └── user/
-│       ├── __init__.py
-│       └── user_repository_impl.py
-└── models/
-    ├── __init__.py
-    └── users.py
+├─ __init__.py
+├─ repository/
+│  └─ user/
+│     ├─ __init__.py
+│     └─ user_repository_impl.py # Userリポジトリ実装
+└─ models/
+   ├─ __init__.py
+   └─ users.py # UserのDBモデル
 ```
 
-### 実装ルール
+### ルール
 
-- 集約ごとにディレクトリを作成
-- ファイル名は`{集約名}_repository_impl.py`の形式
-- データベースやORMライブラリごとに実装を分離
+- 集約ごとに`repository/`配下にディレクトリを作成する
+- リポジトリ実装ファイル名は`{集約名}_repository_impl.py`の形式とする
+- データベースやORMライブラリごとに実装を分離する
 - ORMモデルとドメインモデルの変換はリポジトリ実装内で行う
+- `models/`ディレクトリには、使用する技術要素に応じたDBモデルを定義します。
 
-### models/ ディレクトリについて
+## 2. リポジトリクラスの実装
 
-`models/` ディレクトリには、使用するORM（Piccolo、SQLAlchemy、Djangoなど）やデータベースライブラリに応じたDBモデルを定義します。
-
-## 2. リポジトリクラスの実装例
-
-### 基本的なCRUD操作のパターン
+### 例：UserRepositoryImplの実装
 
 ```python
 class UserRepositoryImpl(UserRepository):
@@ -126,30 +125,19 @@ class UserRepositoryImpl(UserRepository):
         )
 ```
 
-## 3. 実装ルール
-
-### クラス設計
+### 実装ルール
 
 - クラス名は`{集約名}RepositoryImpl`の形式
 - ドメイン層のリポジトリインターフェースを継承
 - すべてのメソッドを非同期で実装（`async def`）
 - すべての引数と戻り値に型ヒントを付与
-
-### エラーハンドリング
-
 - 存在チェックを削除・更新前に必ず実行
 - 制約エラーは適切なビジネスエラーに分類
 - 例外チェーンを保持（`from e`）
 - エラーメッセージから適切なエラーコードを判定
-
-### モデル変換
-
 - ORMモデルとドメインモデルの変換はリポジトリ実装内で直接行う
 - 変換ロジックが複雑になる場合は、プライベートメソッドに抽出することを検討
 - 型安全性を保つために適切な型ヒントを付与
-
-### データベース操作
-
 - 必要最小限のカラムのみ取得
 - 複雑なクエリは分割して実装
 - パフォーマンスを考慮したクエリ設計

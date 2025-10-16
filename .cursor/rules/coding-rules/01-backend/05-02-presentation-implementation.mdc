@@ -14,26 +14,37 @@ alwaysApply: false
 
 ## 1. ディレクトリ構造
 
+### 例：userエンドポイントの実装
 ```
 presentation/
-└── api/
-    ├── routes/
-    │   ├── __init__.py
-    │   ├── route.py # メインルータ
-    │   └── {集約名}.py # 集約ごとのルータ
-    └── schema/
-        ├── __init__.py
-        ├── error_response.py # エラーレスポンススキーマ
-        └── {集約名}/ # 集約ごとのスキーマ
-            ├── __init__.py
-            ├── {操作名}_request.py
-            ├── {操作名}_response.py
-            └── {集約名}.py # 集約のスキーマ
+├─ __init__.py
+└─ api/
+   ├─ __init__.py
+   ├─ routes/
+   │  ├─ __init__.py
+   │  ├─ route.py # メインルータ
+   │  └─ user.py # userのルータ
+   └─ schema/
+      ├─ __init__.py
+      ├─ error_response.py # エラーレスポンススキーマ
+      └─ user/ # userのスキーマ
+         ├─ __init__.py
+         ├─ create_user_request.py
+         ├─ create_user_response.py
+         └─ user.py # userのスキーマ
 ```
+
+### ルール
+
+- 集約ごとに`routes/`配下にルータファイルを作成する
+- 集約ごとに`schema/`配下にディレクトリを作成する
+- スキーマファイル名は`{操作名}_request.py`、`{操作名}_response.py`の形式とする
+- 集約共通のスキーマは`{集約名}.py`に定義する
+- メインルータ（`route.py`）でサブルータを集約する
 
 ## 2. エンドポイントの実装
 
-### 基本構造
+### 例：ユーザー作成エンドポイントの実装
 
 ```python
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -90,7 +101,9 @@ async def create_user(
 
 ## 3. スキーマの実装
 
-### リクエストスキーマ
+### 例：スキーマの実装
+
+#### リクエストスキーマ
 
 ```python
 from typing import Annotated
@@ -110,7 +123,7 @@ class CreateUserRequest(BaseModel):
     ]
 ```
 
-### レスポンススキーマ
+#### レスポンススキーマ
 
 ```python
 from datetime import datetime
@@ -128,7 +141,7 @@ class User(BaseModel):
     created_at: datetime = Field(description="作成日時")
 ```
 
-### エラーレスポンス
+#### エラーレスポンス
 
 ```python
 from pydantic import BaseModel, Field

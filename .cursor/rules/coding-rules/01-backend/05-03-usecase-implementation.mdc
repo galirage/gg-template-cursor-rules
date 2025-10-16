@@ -2,7 +2,7 @@
 globs: app/backend/src/usecase/**/*.py
 alwaysApply: false
 ---
-# ユースケース実装ルール
+# ユースケース層実装ルール
 
 ## 概要
 
@@ -14,26 +14,26 @@ alwaysApply: false
 
 ## 1. ディレクトリ構造
 
-### 例：userドメインのユースケース実装
+### 例：userユースケースの実装
 ```
 usecase/
-├── __init__.py
-└── user/
-    ├── __init__.py
-    ├── delete_user_usecase.py
-    ├── create_user_usecase.py
-    └── ...
+├─ __init__.py
+└─ user/
+   ├─ __init__.py
+   ├─ create_user_usecase.py # ユーザー作成
+   ├─ delete_user_usecase.py # ユーザー削除
+   └─ ...
 ```
 
-### 実装ルール
+### ルール
 
-- 集約ごとにディレクトリを作成
-- 各ユースケースは独立したファイルとして実装
-- ファイル名は`{操作名}_usecase.py`の形式
+- 集約ごとにディレクトリを作成する
+- 各ユースケースは独立したファイルとして実装する
+- ファイル名は`{操作名}_usecase.py`の形式とする
 
 ## 2. ユースケースクラスの実装
 
-### 基本構造
+### 例：DeleteUserUseCaseの実装
 
 ```python
 class DeleteUserUseCase:

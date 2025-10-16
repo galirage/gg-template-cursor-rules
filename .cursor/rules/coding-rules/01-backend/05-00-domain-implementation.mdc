@@ -16,19 +16,28 @@ alwaysApply: false
 
 ### 例：userドメインの実装
 ```
-domain/user/
-├── __init__.py      # 空で作成
-├── user.py          # User集約ルート（1つの集約に対して1つ）
-├── id.py            # UserId値オブジェクト
-├── email_address.py # EmailAddress値オブジェクト
-├── name.py          # UserName値オブジェクト
-├── role.py          # UserRole値オブジェクト
-└── repository.py    # UserRepositoryインターフェース（1つの集約に対して1つ）
+domain/
+├─ __init__.py
+└─ user/
+   ├─ __init__.py
+   ├─ user.py # Userエンティティ
+   ├─ id.py # UserId値オブジェクト
+   ├─ email_address.py # EmailAddress値オブジェクト
+   ├─ name.py # UserName値オブジェクト
+   ├─ role.py # UserRole値オブジェクト
+   └─ repository.py # UserRepositoryインタフェース
 ```
-  
+
+### ルール
+
+- 集約ごとにディレクトリを作成する
+- エンティティは集約名と同じファイル名で作成する
+- 値オブジェクトはそれぞれ独立したファイルとして作成する
+- リポジトリインターフェースは1つの集約に1だけ作成する
+
 ## 2. エンティティの実装
 
-### 基本構造
+### 例：Userエンティティの実装
 
 ```python
 from __future__ import annotations
@@ -77,9 +86,9 @@ class User:
 
 ### 実装ルール
 
-- `@dataclass(eq=False, slots=True)` デコレータを使用
+- `@dataclass(eq=False, slots=True)`デコレータを使用
 - すべてのフィールドに型ヒントを付与
-- `__eq__()`、`__hash__()` メソッドを実装（IDベース）
+- `__eq__()`、`__hash__()`メソッドを実装（IDベース）
 - `__post_init__()`メソッドでバリデーションを実装
 - IDフィールドはUUID v4を使用
 - 日時フィールドは`datetime`型でUTCを使用
@@ -108,10 +117,9 @@ class User:
    - 生成時のバリデーションエラーは`ValueError`を発生
    - ビジネスルール違反は適切な例外メッセージを含める
 
-
 ## 3. 値オブジェクトの実装
 
-### 基本構造
+### 例：UserId値オブジェクトの実装
 
 ```python
 from __future__ import annotations
@@ -138,7 +146,7 @@ class UserId:
 
 ## 4. リポジトリインターフェースの実装
 
-### 基本構造
+### 例：UserRepositoryインターフェースの実装
 
 ```python
 class UserRepository(ABC):
@@ -163,7 +171,7 @@ class UserRepository(ABC):
 
 ## 5. Enumの実装
 
-### 基本構造
+### 例：UserRole Enumの実装
 
 ```python
 class UserRole(str, Enum):
