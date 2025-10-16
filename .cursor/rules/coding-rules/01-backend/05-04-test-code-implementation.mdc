@@ -283,34 +283,40 @@ def test_NG(email_address: str) -> None:
 - 対象: REST API（FastAPIで実装）
 - 使用ツール: Schemathesis（OpenAPIスキーマ駆動）
 
-### 2.2 OpenAPIスキーマの活用
-
-#### スキーマ定義
-
-- スキーマ定義は`presentation/api/schema`以下に配置します。
-- スキーマ定義は`pydantic`を使用して定義します。
-- スキーマ定義は`pydantic`の`BaseModel`を継承して定義します。
-- スキーマ定義は`pydantic`の`Field`を使用してフィールドを定義します。
-- スキーマ定義は`pydantic`の`Literal`を使用してフィールドの型を定義します。
-- スキーマ定義は`pydantic`の`Annotated`を使用してフィールドの型を定義します。
-- Nullバイトを許可しないようにするため、`SafeStr`を使用してフィールドの型を定義します。
+### 2.2 実装方法
 
 ```python
-from datetime import datetime
-from typing import Annotated, Literal
+"""API契約テスト。
 
-from pydantic import BaseModel, Field
+OpenAPIスキーマに基づくAPIコントラクトの検証を行う。
+"""
 
-from src.presentation.api.schema.safe_str import SafeStr
+import pytest
+import schemathesis
+from hypothesis import HealthCheck, settings
+from schemathesis import Case
+
+# OpenAPI 3.1.0 実験的サポートを有効化
+schemathesis.experimental.OPEN_API_3_1.enable()
+
+# テスト対象スキーマ
+schema = schemathesis.from_uri("http://localhost:8000/openapi.json")
 
 
-class User(BaseModel):
-    id: Annotated[SafeStr, Field(description="ユーザーID")]
-    email: Annotated[SafeStr, Field(description="メールアドレス")]
-    role: Annotated[
-        Literal["superadmin", "admin", "member"], Field(description="ロール")
-    ]
-    name: Annotated[SafeStr, Field(description="ユーザー名")]
-    created_at: datetime = Field(description="作成日時")
+@settings(
+    deadline=10000,
+    suppress_health_check=[HealthCheck.too_slow],
+)
+@schema.parametrize()
+def test_api_contract_compliance(case: Case) -> None:
+    try:
+        response = case.call()
+        case.validate_response(response)
+    except (ValueError, RuntimeError, ConnectionError, TimeoutError) as e:
+        pytest.fail(f"Contract test failed for {case.method} {case.path}: {e}")
 
+
+if __name__ == "__main__":
+    # 直接実行時の設定
+    pytest.main([__file__, "-v", "--tb=short"])
 ```
