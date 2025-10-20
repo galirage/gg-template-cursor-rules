@@ -77,7 +77,7 @@ async def create_user(
             user=UserSchema(
                 id=user.id.value,
                 email=user.email.value,
-                name=user.name.value if user.name else "",
+                name=user.name.value,
                 role=user.role.value.value,
                 created_at=user.created_at,
             )
