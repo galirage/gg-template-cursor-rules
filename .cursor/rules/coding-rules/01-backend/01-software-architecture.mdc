@@ -45,7 +45,7 @@ app/backend/src/
 ├── infrastructure/               # インフラ層（外部I/Oの具体実装）
 │   ├── repository/               # リポジトリ実装
 │   │   └── user/
-│   │       └── user_repository_impl.py
+│   │       └── postgresql_user_repository.py
 │   └── models/                   # DBモデル
 │       └── users.py
 ├── presentation/                 # プレゼンテーション層（外界との接点）

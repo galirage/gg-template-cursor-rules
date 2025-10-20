@@ -21,7 +21,7 @@ infrastructure/
 ├─ repository/
 │  └─ user/
 │     ├─ __init__.py
-│     └─ user_repository_impl.py # Userリポジトリ実装
+│     └─ postgresql_user_repository.py # PostgreSQLを使ったUserリポジトリ実装
 └─ models/
    ├─ __init__.py
    └─ users.py # UserのDBモデル
@@ -30,17 +30,18 @@ infrastructure/
 ### ルール
 
 - 集約ごとに`repository/`配下にディレクトリを作成する
-- リポジトリ実装ファイル名は`{集約名}_repository_impl.py`の形式とする
+- リポジトリ実装ファイル名は`{技術名}_{集約名}_repository.py`の形式とする（例：`postgresql_user_repository.py`、`sqlalchemy_user_repository.py`）
+- 使用しているデータベースやORM/技術名を接頭辞に含めることで、実装の特徴を明確にする
 - データベースやORMライブラリごとに実装を分離する
 - ORMモデルとドメインモデルの変換はリポジトリ実装内で行う
 - `models/`ディレクトリには、使用する技術要素に応じたDBモデルを定義します。
 
 ## 2. リポジトリクラスの実装
 
-### 例：UserRepositoryImplの実装
+### 例 UserRepositoryの実装 (PosgreSQLを使用した場合)
 
 ```python
-class UserRepositoryImpl(UserRepository):
+class PostgresqlUserRepository(UserRepository):
     async def find_by_id(self, user_id: UserId) -> User:
         user_model = await UserModel.select().where(UserModel.id == user_id.value).first()
         
@@ -127,7 +128,8 @@ class UserRepositoryImpl(UserRepository):
 
 ### 実装ルール
 
-- クラス名は`{集約名}RepositoryImpl`の形式
+- クラス名は`{技術名}{集約名}Repository`の形式（例：`PostgresqlUserRepository`）
+- 使用しているデータベースやORM/技術名を接頭辞に含めることで、実装の特徴を明確にする
 - ドメイン層のリポジトリインターフェースを継承
 - すべてのメソッドを非同期で実装（`async def`）
 - すべての引数と戻り値に型ヒントを付与
