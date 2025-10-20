@@ -60,14 +60,13 @@ async def find_by_id(self, user_id: UserId) -> User:
     """IDでユーザーを検索する。
 
     Args:
-        user_id: 検索するユーザーID
+        user_id (UserId): 検索するユーザーID
 
     Returns:
-        見つかったユーザー
+        User: 見つかったユーザー
 
     Raises:
         ExpectedBusinessError: ユーザーが見つからない場合
-
     """
     user = await UserModel.select().where(UserModel.id == user_id.value).first()
 
@@ -86,7 +85,17 @@ async def find_by_id(self, user_id: UserId) -> User:
 
 ```python
 async def save(self, user: User) -> User:
-    """ユーザーを保存する。"""
+    """ユーザーを保存する。
+
+    Args:
+        user (User): 保存するユーザー
+
+    Returns:
+        User: 保存されたユーザー
+
+    Raises:
+        ExpectedBusinessError: メールアドレスがすでに存在する場合
+    """
     try:
         db_data = UserMapper.to_db(user)
         await UserModel.insert(
