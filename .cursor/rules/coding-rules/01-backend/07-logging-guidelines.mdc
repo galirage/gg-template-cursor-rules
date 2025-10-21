@@ -34,21 +34,9 @@ logger.error("ユーザー保存エラー", user_id=user.id.value, error=str(e))
 
 ## 禁止事項
 
-### print()の使用
+### 例：print()の使用
 
 ```python
 # NG
 print(f"警告: テーブル {table_name} のクリーンアップ失敗: {e}")
 ```
-
-### loggerの使用
-
-```python
-# OK
-logger.warning(
-    "テストセットアップ中のテーブルクリーンアップ失敗",
-    table_name=table_name,
-    error=str(e)
-)
-```
-
