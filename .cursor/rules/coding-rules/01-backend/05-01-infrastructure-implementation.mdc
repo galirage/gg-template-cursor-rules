@@ -30,7 +30,7 @@ infrastructure/
 ### ルール
 
 - 集約ごとに`repository/`配下にディレクトリを作成する
-- リポジトリ実装ファイル名は`{技術名}_{集約名}_repository.py`の形式とする（例：`postgresql_user_repository.py`、`sqlalchemy_user_repository.py`）
+- リポジトリ実装ファイル名は`{技術名}_{集約名}_repository.py`の形式とする（例：`postgresql_user_repository.py`）
 - 使用しているデータベースやORM/技術名を接頭辞に含めることで、実装の特徴を明確にする
 - データベースやORMライブラリごとに実装を分離する
 - ORMモデルとドメインモデルの変換はリポジトリ実装内で行う
@@ -38,7 +38,7 @@ infrastructure/
 
 ## 2. リポジトリクラスの実装
 
-### 例 UserRepositoryの実装 (PosgreSQLを使用した場合)
+### 例 UserRepositoryの実装 (PostgreSQLを使用した場合)
 
 ```python
 class PostgresqlUserRepository(UserRepository):
@@ -128,7 +128,7 @@ class PostgresqlUserRepository(UserRepository):
 
 ### 実装ルール
 
-- クラス名は`{技術名}{集約名}Repository`の形式（例：`PostgresqlUserRepository`）
+- クラス名は`{技術名}{集約名}Repository`の形式
 - 使用しているデータベースやORM/技術名を接頭辞に含めることで、実装の特徴を明確にする
 - ドメイン層のリポジトリインターフェースを継承
 - すべてのメソッドを非同期で実装（`async def`）

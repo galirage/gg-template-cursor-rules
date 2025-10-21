@@ -38,7 +38,7 @@ domain/
 │   └── repository.py    # 単体テスト対象外(結合テストで検証)
 
 # ユースケース層（重要）
-use_case/
+usecase/
 └── user/
     ├── __init__.py           # テスト不要
     ├── save_user_usecase.py  # 必須
@@ -245,11 +245,11 @@ class TestChat:
 #### 異常系テスト
 
 - 異常系のテストは、`def test_NG_{テストする内容}` という形式で命名します。
-  - 例: `def test_NG_不正なメールアドレスを渡した時にInvalidEmailAdressErrorが返ること()`
+  - 例: `def test_NG_不正なメールアドレスを渡した時にInvalidEmailAddressErrorが返ること()`
 
 ```python
 class TestUserRegistration:
-    def test_NG_不正なメールアドレスを渡した時にInvalidEmailAdressErrorが返ること(self):
+    def test_NG_不正なメールアドレスを渡した時にInvalidEmailAddressErrorが返ること(self):
         # 異常系テストの実装例
         pass
 ```
