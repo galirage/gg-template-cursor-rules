@@ -50,11 +50,11 @@ use_case/
 ```python
 # インフラ層（統合テストで検証）
 infrastructure/
-├── repository/         # 単体テスト対象外とし、リポジトリは結合テストで検証
+├── repository/ # 単体テスト対象外とし、リポジトリは結合テストで検証
 
 # プレゼンテーション層（契約テストで検証）
 presentation/
-└── api/                # 単体テスト対象外とし、契約テストで検証
+└── api/ # 単体テスト対象外とし、契約テストで検証
 ```
 
 ### 1.3 実装例
@@ -90,7 +90,6 @@ class TestInit:
 
         # assert
         assert user.role == Role()
-        assert user.is_deleted is False
         assert isinstance(user.id, UserId)
         assert isinstance(user.created_at, datetime)
 ```

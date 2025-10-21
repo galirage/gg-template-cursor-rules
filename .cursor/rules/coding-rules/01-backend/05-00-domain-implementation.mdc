@@ -33,7 +33,7 @@ domain/
 - 集約ごとにディレクトリを作成する
 - エンティティは集約名と同じファイル名で作成する
 - 値オブジェクトはそれぞれ独立したファイルとして作成する
-- リポジトリインターフェースは1つの集約に1だけ作成する
+- リポジトリインターフェースは1つの集約に1つだけ作成する
 
 ## 2. エンティティの実装
 
@@ -44,10 +44,10 @@ from __future__ import annotations
 
 @dataclass(eq=False, slots=True)
 class User:
-    id: UserId
     email: EmailAddress
     name: UserName
-    role: Role
+    id: UserId = field(default_factory=lambda: UserId(value=str(uuid.uuid4())))
+    role: Role = field(default_factory=lambda: Role())
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
