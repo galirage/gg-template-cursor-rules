@@ -22,12 +22,14 @@
 
 ### 入力例
 
+対象ファイルのみ指定する場合
 ```
 @commands/create-unit-test
 
 対象: src/domain/user/email_address.py
 ```
 
+テストケースも指定する場合
 ```
 @commands/create-unit-test
 
@@ -52,6 +54,7 @@
 
 ### 入力例
 
+レビュー対象を指定する場合
 ```
 @commands/review-codes
 
@@ -74,12 +77,12 @@
 
 ### 入力例
 
+コミットメッセージの生成をAIエージェントに任せる場合
 ```
 @commands/commit-and-push
-
-feat: ユーザー作成APIを追加
 ```
 
+コミットメッセージを指定する場合
 ```
 @commands/commit-and-push
 
@@ -100,13 +103,14 @@ fix(auth): トークン検証ロジックのバグを修正
 
 ### 入力例
 
+AIエージェントに任せる場合
 ```
 @commands/create-pull-request
 
-ブランチ: feat/add-create-user-api
 関連Issue: #42
 ```
 
+詳細を指定する場合
 ```
 @commands/create-pull-request
 
@@ -121,8 +125,7 @@ fix(auth): トークン検証ロジックのバグを修正
 
 ### 期待されるアウトプット
 
-適切なタイトルと説明文を持つPRが作成され、URLが提示される
-
+適切なタイトルと説明文を持つPRが作成される
 ---
 
 ## update-documents
@@ -133,20 +136,14 @@ fix(auth): トークン検証ロジックのバグを修正
 
 ### 入力例
 
+対象を簡潔に指定する場合
 ```
 @commands/update-documents
 
 README.md を最新の実装に合わせて更新してください
 ```
 
-```
-@commands/update-documents
-
-.cursor/rules/coding-rules/01-backend/00-tech-stack.mdc を更新してください
-pyproject.toml のバージョンと一致させる必要があります
-```
-
 ### 期待されるアウトプット
 
-実装とドキュメントの差分が表示され、更新提案が提示される
+実装とドキュメントの差分が表示され、更新される
 
