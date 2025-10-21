@@ -80,67 +80,28 @@ class PostgresqlUserRepository(UserRepository):
                 ) from e
             raise
         return user
-    
-    async def delete(self, user_id: UserId) -> UserId:
-        user_model = await UserModel.select().where(UserModel.id == user_id.value).first()
-        
-        if user_model is None:
-            raise ExpectedBusinessError(
-                code=UserErrorCode.NotFound,
-                details={"user_id": user_id.value},
-            )
-        
-        await UserModel.delete().where(UserModel.id == user_id.value)
-        return UserId(value=user_id.value)
-    
-    async def filter(self) -> list[User]:
-        user_models = await UserModel.objects()
-        
-        # リスト内包表記でORMモデルをドメインモデルに変換
-        return [
-            User(
-                id=UserId(value=user_model.id),
-                name=UserName(value=user_model.name),
-                email=EmailAddress(value=user_model.email),
-                role=Role(value=RoleEnum(user_model.role)),
-                created_at=user_model.created_at,
-            )
-            for user_model in user_models
-        ]
-    
-    async def find_by_email(self, email: EmailAddress) -> User:
-        user_model = await UserModel.select().where(UserModel.email == email.value).first()
-        
-        if user_model is None:
-            raise ExpectedBusinessError(
-                code=UserErrorCode.NotFound,
-                details={"email": email.value},
-            )
-        
-        return User(
-            id=UserId(value=user_model.id),
-            name=UserName(value=user_model.name),
-            email=EmailAddress(value=user_model.email),
-            role=Role(value=RoleEnum(user_model.role)),
-            created_at=user_model.created_at,
-        )
 ```
 
 ### 実装ルール
 
+#### クラス設計
 - クラス名は`{技術名}{集約名}Repository`の形式
-- 使用しているデータベースやORM/技術名を接頭辞に含めることで、実装の特徴を明確にする
 - ドメイン層のリポジトリインターフェースを継承
 - すべてのメソッドを非同期で実装（`async def`）
 - すべての引数と戻り値に型ヒントを付与
+
+#### エラーハンドリング
 - 存在チェックを削除・更新前に必ず実行
 - 制約エラーは適切なビジネスエラーに分類
 - 例外チェーンを保持（`from e`）
 - エラーメッセージから適切なエラーコードを判定
+
+#### データ変換
 - ORMモデルとドメインモデルの変換はリポジトリ実装内で直接行う
 - 変換ロジックが複雑になる場合は、プライベートメソッドに抽出することを検討
 - 型安全性を保つために適切な型ヒントを付与
+
+#### パフォーマンス
 - 必要最小限のカラムのみ取得
 - 複雑なクエリは分割して実装
 - パフォーマンスを考慮したクエリ設計
-- 実際のORM操作を直接実装（抽象化しない）
