@@ -38,5 +38,5 @@ PRテンプレート（`.github/pull_request_template.md`）を使用する。
 
 ### PR作成
 - [ ] タイトルが規約（`type: 概要 (#番号)`）に従っている
-- [ ] 本文に `- Close #{issue番号}` を記載している
+- [ ] 本文に `- Closes #{issue番号}` を記載している
 - [ ] 適切なAssigneeを設定している
