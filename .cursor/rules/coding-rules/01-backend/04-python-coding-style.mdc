@@ -6,7 +6,7 @@ alwaysApply: false
 # バックエンド (FastAPI): コーディングスタイル
 
 Pythonバックエンド固有のコーディングスタイルルールです。
-`.cursor/rules/coding-rules/00-common/00-common-rules.mdc` よりもさらに詳細なコーディングルールについて記載しています。
+`.cursor/rules/coding-rules/00-common/00-common-rules.mdc`よりもさらに詳細なコーディングルールについて記載しています。
 
 ## Python固有の命名規則
 
@@ -20,7 +20,7 @@ Pythonバックエンド固有のコーディングスタイルルールです�
 
 ### 基本的な使用方法
 - すべての関数に**引数と戻り値の型**を明示する
-- Python 3.12+ の構文を使用する
+- Python 3.12+の構文を使用する
 
 ## コメントの書き方
 
@@ -56,80 +56,34 @@ class User:
 すべてのメソッドにGoogle形式のdocstringを記載します。
 
 ```python
-async def find_by_id(self, user_id: UserId) -> User:
-    """IDでユーザーを検索する。
+@staticmethod
+def random(
+    role: Role | None = None,
+    name: UserName | None = None,
+) -> User:
+    """テスト用のランダムなユーザーを生成する。
 
     Args:
-        user_id (UserId): 検索するユーザーID
+        role (Role | None): 指定するロール(Noneの場合はデフォルトロール)
+        name (UserName | None): 指定するユーザー名(Noneの場合はランダムな名前)
 
     Returns:
-        User: 見つかったユーザー
-
-    Raises:
-        ExpectedBusinessError: ユーザーが見つからない場合
+        User: ランダムなユーザー
     """
-    user = await UserModel.select().where(UserModel.id == user_id.value).first()
-
-    if user is None:
-        raise ExpectedBusinessError(
-            code=UserErrorCode.NotFound,
-            details={"user_id": user_id.value},
-        )
-
-    return UserMapper.to_domain(user)
+    email = EmailAddress.random()
+    return User(
+        email=email,
+        role=role or Role(value=RoleEnum.MEMBER),
+        name=name or UserName(value="test_name"),
+    )
 ```
 
-### インラインコメント
-
-処理の意図や仕様変更時の注意点を記載します。
-
-```python
-async def save(self, user: User) -> User:
-    """ユーザーを保存する。
-
-    Args:
-        user (User): 保存するユーザー
-
-    Returns:
-        User: 保存されたユーザー
-
-    Raises:
-        ExpectedBusinessError: メールアドレスがすでに存在する場合
-    """
-    try:
-        db_data = UserMapper.to_db(user)
-        await UserModel.insert(
-            UserModel(
-                id=db_data["id"],
-                email=db_data["email"],
-                role=db_data["role"],
-                name=db_data["name"],
-            ),
-        )
-    except Exception as e:
-        # メールアドレスの一意制約違反の場合、ビジネスエラーに変換
-        if "email" in str(e).lower():
-            raise ExpectedBusinessError(
-                code=UserErrorCode.EmailAlreadyExists,
-                details={"email": user.email.value},
-            ) from e
-        raise
-    return user
-```
-
-### コメント記述のベストプラクティス
+## インラインコメントの書き方
 
 #### ✅ 良い例
 
 ```python
-# ユーザーが見つからない場合はビジネスエラーを発生
-if user is None:
-    raise ExpectedBusinessError(code=UserErrorCode.NotFound)
-
-# UserModel.objects()の結果をdictのリストに変換
-user_dicts = [user.to_dict() for user in users]
-
-# 管理者は特定のメール形式でないと作成できない
+# 管理者は特定のメール形式でないと作成できない（ビジネスルール）
 if not email.endswith("@admin.company.com"):
     raise ValueError("管理者は@admin.company.comドメインのメールが必要です")
 ```
