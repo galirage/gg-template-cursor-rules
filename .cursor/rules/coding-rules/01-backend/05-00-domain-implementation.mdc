@@ -24,7 +24,7 @@ domain/
    ├─ id.py # UserId値オブジェクト
    ├─ email_address.py # EmailAddress値オブジェクト
    ├─ name.py # UserName値オブジェクト
-   ├─ role.py # UserRole値オブジェクト
+   ├─ role.py # Role値オブジェクト
    └─ repository.py # UserRepositoryインタフェース
 ```
 
@@ -47,7 +47,7 @@ class User:
     id: UserId
     email: EmailAddress
     name: UserName
-    role: UserRole
+    role: Role
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
@@ -71,7 +71,7 @@ class User:
             id=UserId.random(),
             email=EmailAddress(email),
             name=UserName(name),
-            role=UserRole.ADMIN,
+            role=Role(value=RoleEnum.ADMIN),
         )
 
     @staticmethod
@@ -80,7 +80,7 @@ class User:
             id=UserId.random(),
             email=EmailAddress.random(),
             name=UserName.random(),
-            role=UserRole.GENERAL,
+            role=Role(value=RoleEnum.MEMBER),
         )
 ```
 
@@ -171,14 +171,16 @@ class UserRepository(ABC):
 
 ## 5. Enumの実装
 
-### 例：UserRole Enumの実装
+### 例：RoleEnumの実装
 
 ```python
-class UserRole(str, Enum):
-    ADMIN = "ADMIN"
-    GENERAL = "GENERAL"
+class RoleEnum(str, Enum):
+    SUPERADMIN = "superadmin"
+    ADMIN = "admin"
+    MEMBER = "member"
 ```
 
 ### 実装ルール
-- `str, Enum` を多重継承
-- 値は大文字のスネークケース
+- `str, Enum`を多重継承
+- Enum名は大文字スネークケース
+- 値文字列は小文字

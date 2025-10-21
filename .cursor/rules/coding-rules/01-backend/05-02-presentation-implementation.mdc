@@ -50,6 +50,7 @@ presentation/
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Annotated
 from pydantic import BaseModel, Field
+from src.presentation.api.schema.user.user import User as UserSchema
 
 user_router = APIRouter(tags=["users"])
 
