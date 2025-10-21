@@ -6,7 +6,7 @@
 
 | コマンド | 概要 |
 |---------|------|
-| `create-unit-test` | ユニットテストコードを生成します |
+| `create-unit-test` | 単体テストコードを生成します |
 | `review-codes` | コードレビューを実施します |
 | `commit-and-push` | 変更内容のコミットとプッシュを行います |
 | `create-pull-request` | PR（Pull Request）を作成します |
@@ -16,9 +16,9 @@
 
 ## create-unit-test
 
-**概要**: ユニットテストコードを生成します
+**概要**: 単体テストコードを生成します
 
-**用途**: 指定したコードに対するユニットテストのコードを自動で作成したい場合に使用します
+**用途**: 指定したコードに対する単体テストのコードを自動で作成したい場合に使用します
 
 ### 入力例
 
@@ -60,12 +60,12 @@
 
 以下のファイルをレビューしてください:
 - src/usecase/user/create_user_usecase.py
-- src/infrastructure/repository/user/user_repository_impl.py
+- src/infrastructure/repository/user/postgresql_user_repository.py
 ```
 
 ### 期待されるアウトプット
 
-チェックリストに基づいた改善提案（Must/Should/Nit/Question形式）がまとめられる
+チェックリストに基づいた改善提案がまとめられる
 
 ---
 
@@ -126,6 +126,7 @@ AIエージェントに任せる場合
 ### 期待されるアウトプット
 
 適切なタイトルと説明文を持つPRが作成される
+
 ---
 
 ## update-documents
@@ -146,4 +147,3 @@ README.md を最新の実装に合わせて更新してください
 ### 期待されるアウトプット
 
 実装とドキュメントの差分が表示され、更新される
-
