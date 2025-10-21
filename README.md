@@ -137,7 +137,7 @@ Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules
 - **カスタマイズポイント**
   - プロジェクトに合わせてコーディングスタイルを調整してください。
 
-#### `05-01-domain-implementation.mdc`
+#### `05-00-domain-implementation.mdc`
 
 - **概要**
   - ドメイン層の実装ルール（エンティティ、値オブジェクト、リポジトリインタフェース）を定義します。
@@ -146,7 +146,7 @@ Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules
 - **カスタマイズポイント**
   - ソフトウェアアーキテクチャやディレクトリ構成をプロジェクトに合わせて調整してください。
 
-#### `05-02-infrastructure-implementation.mdc`
+#### `05-01-infrastructure-implementation.mdc`
 
 - **概要**
   - インフラ層の実装ルール（リポジトリ実装）を定義します。
@@ -156,7 +156,7 @@ Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules
   - ソフトウェアアーキテクチャやディレクトリ構成をプロジェクトに合わせて調整してください。
   - 採用するDBやORM（Piccolo、SQLAlchemy等）をプロジェクトに合わせて調整してください。
 
-#### `05-03-presentation-implementation.mdc`
+#### `05-02-presentation-implementation.mdc`
 
 - **概要**
   - プレゼンテーション層の実装ルール（FastAPIルーター、リクエスト/レスポンススキーマ）を定義します。
@@ -166,7 +166,7 @@ Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules
   - ソフトウェアアーキテクチャやディレクトリ構成をプロジェクトに合わせて調整してください。
 
 
-#### `05-04-usecase-implementation.mdc`
+#### `05-03-usecase-implementation.mdc`
 
 - **概要**
   - ユースケース層（アプリケーション層）の実装ルールを定義します。
@@ -176,7 +176,7 @@ Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules
   - ソフトウェアアーキテクチャやディレクトリ構成をプロジェクトに合わせて調整してください。
 
 
-#### `05-05-test-code-implementation.mdc`
+#### `05-04-test-code-implementation.mdc`
 
 - **概要**
   - テスト戦略と実装ルールを定義します。
