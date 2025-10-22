@@ -1,1 +1,1 @@
-# Definition of Ready（受け入れ条件）
+# Definition of Ready（準備完了の定義）
