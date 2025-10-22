@@ -1,4 +1,4 @@
-# Code Review Guidelines
+# Review Process Guidelines
 
 > **目的**：コードレビューの基準を明確化し、品質とチームの一貫性を保つ。
 > **スコープ**：レビュー方針、コメントガイドライン、承認・再依頼のルール。
