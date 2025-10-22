@@ -1,0 +1,138 @@
+# Git Guidelines
+
+> **目的**：チームの履歴を読みやすくし、Git 操作およびリリース作業を自動化しやすい形にする。  
+> **スコープ**：ブランチ運用、ブランチ命名規則、コミットメッセージなど。
+
+---
+
+## ブランチ運用
+
+- **main**:
+  - 常にデプロイ可能。
+  - 保護あり（force-push 禁止 / 直 push 禁止 / レビュー必須）
+- **develop**:
+  - 継続開発ライン。main へは PR で統合。
+  - main から派生。
+- **feature/**:
+  - 新機能・改善などの作業ライン。develop から派生。
+- **bugfix/**:
+  - 軽微な不具合修正ライン。main から派生。
+- **hotfix/**:
+  - 緊急修正用ライン。main から派生。
+- **release/**:
+  - リリース準備用ライン。main から派生。
+
+### ルール
+
+- main/develop への直 push は禁止（必ず PR 経由）。
+
+---
+
+## ブランチ命名規則
+
+- **feature/**`{issueId}-{short-kebab-summary}`
+  - 例: `feature/1234-add-login-form`
+- **bugfix/**`GG-{issueId}-{short-kebab-summary}`
+  - 例: `bugfix/7890-fix-ui-layout`
+- **hotfix/**`GG-{issueId}-{short-kebab-summary}`
+  - 例: `hotfix/5678-fix-deploy-error`
+- **release/**`{version}`
+  - 例: `release/1.2.0`
+
+---
+
+## コミットメッセージ（Conventional Commits）
+
+### 形式
+
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+### type（必須）
+
+| 種類       | 用途                                     |
+| ---------- | ---------------------------------------- |
+| `feat`     | 新機能                                   |
+| `fix`      | バグ修正                                 |
+| `docs`     | ドキュメントのみ                         |
+| `style`    | フォーマット変更のみ（ロジック変更なし） |
+| `refactor` | 構造改善（機能変更なし）                 |
+| `test`     | テスト追加／修正                         |
+| `chore`    | ツール・設定・ビルド関連                 |
+| `perf`     | 性能改善                                 |
+| `build`    | 依存更新・ビルド処理変更                 |
+| `ci`       | CI 設定関連                              |
+
+### scope（任意）
+
+- サブシステム／ディレクトリ／機能単位など
+  - 例：`feat(auth): add OAuth2 PKCE flow`
+
+### subject（必須）
+
+- 日本語または英語で記載
+- 文末ピリオド不要／50 字以内を推奨
+- 日本語の場合は簡潔に「何をしたか」が分かる表現にする
+  - 例：`feat(auth): トークンリフレッシュ処理を修正`
+- 英語の場合は命令形で書く
+  - 悪い例：`fixed bug`
+  - 良い例：`fix auth token refresh`
+
+### body（任意）
+
+- 変更理由・背景・設計判断などを簡潔に記述
+- 日本語／英語どちらでも可
+- 箇条書き可（72 字で折り返し推奨）
+
+### footer（任意）
+
+- 関連 Issue：`Closes #123`, `Refs #456`
+- 破壊的変更：`BREAKING CHANGE: <内容>`
+
+### コミット例（日本語）
+
+```
+fix(api): トークンリフレッシュ時の認証エラーを修正
+
+・期限切れトークンの場合は再認証を実行するよう修正
+・ログ出力のフォーマットを改善
+
+Closes #456
+```
+
+### コミット例（英語）
+
+```
+feat(auth): add OAuth2 PKCE flow
+
+Introduce PKCE to mitigate code interception attacks.
+- Store verifier in secure storage
+- Rotate tokens every 30 min
+
+Closes #123
+```
+
+### BREAKING CHANGE の例
+
+```
+feat(api)!: drop legacy v1 endpoints
+
+BREAKING CHANGE: remove /v1/* routes. Use /v2/* instead.
+```
+
+### 禁止事項
+
+- `WIP` や意味のないメッセージ（例：`update`, `fix` だけ）
+- 複数目的を 1 コミットに混在させる（例：`refactor` と `fix` は分離）
+
+### よくある難点と回避策
+
+1. `refactor` と `fix` の混在
+   - **回避策**：バグ修正は `fix`、内部改善は `refactor`。混ざる場合はコミットを分ける。
+2. 意味の薄い subject（例：`update`, `minor change`）
+   - **回避策**：「何を」「なぜ」を 1 行で書く。レビュアーが diff を開かずに意図を理解できるかを基準にする。
