@@ -1,0 +1,7 @@
+# project-config.yaml
+# **目的**: Cursor AI で使用するプロジェクトの設定情報を管理するファイルです。
+
+project:
+  github_repository_name: "gg-template-cursor-rules"
+  github_repository_url: "https://github.com/galirage/gg-template-cursor-rules"
+  github_project_id: ""
