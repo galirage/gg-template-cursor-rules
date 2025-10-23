@@ -1,6 +1,5 @@
 ---
-description: Git operation guidelines and branch naming conventions
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Git Operations Guidelines
@@ -83,30 +82,25 @@ alwaysApply: false
 ### scope（任意）
 
 - サブシステム／ディレクトリ／機能単位など
-  - 例：`feat(auth): トークンリフレッシュ処理を修正`
 
 ### subject（必須）
 
-- 日本語または英語で記載
+- 日本語で記載
 - 文末ピリオド不要／50 字以内を推奨
-- 日本語の場合は簡潔に「何をしたか」が分かる表現にする
-  - 例：`feat(auth): トークンリフレッシュ処理を修正`
-- 英語の場合は命令形で書く
-  - 悪い例：`fixed bug`
-  - 良い例：`fix auth token refresh`
+- 簡潔に「何をしたか」が分かる表現にする
 
 ### body（任意）
 
-- 変更理由・背景・設計判断などを簡潔に記述
-- 日本語または英語で記載
+- 日本語で記載
 - 箇条書き可（72 字で折り返し推奨）
+- 簡潔に変更理由・背景・設計判断などを記述
 
 ### footer（任意）
 
 - 関連 Issue：`Closes #123`, `Refs #456`
 - 破壊的変更：`BREAKING CHANGE: <内容>`
 
-### コミット例（日本語）
+### コミット例
 
 ```
 fix(api): トークンリフレッシュ時の認証エラーを修正
@@ -117,24 +111,12 @@ fix(api): トークンリフレッシュ時の認証エラーを修正
 Closes #456
 ```
 
-### コミット例（英語）
-
-```
-feat(auth): add OAuth2 PKCE flow
-
-Introduce PKCE to mitigate code interception attacks.
-- Store verifier in secure storage
-- Rotate tokens every 30 min
-
-Closes #123
-```
-
 ### BREAKING CHANGE の例
 
 ```
-feat(api)!: drop legacy v1 endpoints
+feat(api)!: 旧 v1 エンドポイントを削除
 
-BREAKING CHANGE: remove /v1/* routes. Use /v2/* instead.
+BREAKING CHANGE: /v1/* のルートを削除しました。代わりに /v2/* を使用してください。
 ```
 
 ### 禁止事項
