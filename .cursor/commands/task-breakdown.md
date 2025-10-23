@@ -7,6 +7,7 @@
 
 ## Rules
 
+- タスクは `.cursor/rules/task-breakdown-guideline.mdc` のガイドラインに従って分解すること。
 - タスクは `.github/ISSUE_TEMPLATE/TASK_TEMPLATE.md` を使用して作成し、**Markdown 形式**で出力すること。
 - 出力先ディレクトリは `flow/{今日の日付}/{PBIタイトル}/` とし、存在しない場合は新規作成すること。
 
