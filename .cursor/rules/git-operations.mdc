@@ -42,14 +42,14 @@ alwaysApply: false
 
 - **feature/**`{issueId}-{short-kebab-summary}`
   - 例: `feature/1234-add-login-form`
-- **bugfix/**`{issueId}-{short-kebab-summary}`
-  - 例: `bugfix/1234_-fix-ui-layout`
 - **chore/**`{issueId}-{short-kebab-summary}`
   - 例: `chore/1234_update-eslint-config`
+- **bugfix/**`{issueId}-{short-kebab-summary}`
+  - 例: `bugfix/1234_-fix-ui-layout`
 - **hotfix/**`{issueId}-{short-kebab-summary}`
   - 例: `hotfix/1234-fix-deploy-error`
 - **release/**`{version}`
-  - 例: `release/1.2.0`
+  - 例: `release/v1.2.0`
 
 ---
 
