@@ -8,19 +8,29 @@
 ## ブランチ運用
 
 - **main**:
-  - 常にデプロイ可能。
-  - 保護あり（force-push 禁止 / 直 push 禁止 / レビュー必須）
+  - 常にデプロイ可能な安定ブランチ。
+  - リリース済みの最新状態を保持する。
+  - develop または release からのみマージを許可。
 - **develop**:
-  - 継続開発ライン。main へは PR で統合。
-  - main から派生。
+  - 継続開発用のブランチ。
+  - 日常的な開発作業（新機能・改善・調整など）はこのブランチから派生。
+  - 完了後、main へは Pull Request により統合。
 - **feature/**:
-  - 新機能・改善などの作業ライン。develop から派生。
+  - 新機能追加や既存機能の改善を行うブランチ。
+  - develop から派生し、完了後は develop にマージ。
+- **chore/**:
+  - 機能やバグ修正に直接関係しない、開発環境や設定の変更、依存関係の更新などを行うブランチ。
+  - develop または main から派生。
 - **bugfix/**:
-  - 軽微な不具合修正ライン。main から派生。
+  - 軽微な不具合修正を行うブランチ。
+  - 主に main から派生し、修正後に develop および main へマージ。
 - **hotfix/**:
-  - 緊急修正用ライン。main から派生。
+  - 本番環境で発生した緊急の不具合対応を行うブランチ。
+  - main から直接派生し、修正後は main および develop にマージ。
 - **release/**:
-  - リリース準備用ライン。main から派生。
+  - リリース準備用ブランチ。
+  - develop から派生し、バージョン番号の更新、リリースノート作成などを行う。
+  - 確認後、main にマージしてリリース。
 
 ### ルール
 
@@ -32,10 +42,12 @@
 
 - **feature/**`{issueId}-{short-kebab-summary}`
   - 例: `feature/1234-add-login-form`
-- **bugfix/**`GG-{issueId}-{short-kebab-summary}`
-  - 例: `bugfix/7890-fix-ui-layout`
-- **hotfix/**`GG-{issueId}-{short-kebab-summary}`
-  - 例: `hotfix/5678-fix-deploy-error`
+- **bugfix/**`{issueId}-{short-kebab-summary}`
+  - 例: `bugfix/1234_-fix-ui-layout`
+- **chore/**`{issueId}-{short-kebab-summary}`
+  - 例: `chore/1234_update-eslint-config`
+- **hotfix/**`{issueId}-{short-kebab-summary}`
+  - 例: `hotfix/1234-fix-deploy-error`
 - **release/**`{version}`
   - 例: `release/1.2.0`
 
@@ -71,7 +83,7 @@
 ### scope（任意）
 
 - サブシステム／ディレクトリ／機能単位など
-  - 例：`feat(auth): add OAuth2 PKCE flow`
+  - 例：`feat(auth): トークンリフレッシュ処理を修正`
 
 ### subject（必須）
 
@@ -86,7 +98,7 @@
 ### body（任意）
 
 - 変更理由・背景・設計判断などを簡潔に記述
-- 日本語／英語どちらでも可
+- 日本語または英語で記載
 - 箇条書き可（72 字で折り返し推奨）
 
 ### footer（任意）
