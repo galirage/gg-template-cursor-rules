@@ -16,3 +16,7 @@ alwaysApply: true
 - プロジェクトに関する情報は`project-config.yaml`を参照すること。
   - Github Projects の ID
   - Github Repository の URL
+
+## 参照
+
+- `.cursor/rules/context/`の内容を開発の文脈として参照すること。
