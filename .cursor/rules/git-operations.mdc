@@ -1,9 +1,9 @@
-# Git Operations Guidelines
-
-> **目的**：チームの履歴を読みやすくし、Git 操作およびリリース作業を自動化しやすい形にする。  
-> **スコープ**：ブランチ運用、ブランチ命名規則、コミットメッセージなど。
-
 ---
+description: Git operation guidelines and branch naming conventions
+alwaysApply: false
+---
+
+# Git Operations Guidelines
 
 ## ブランチ運用
 
