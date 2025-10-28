@@ -1,0 +1,14 @@
+---
+alwaysApply: false
+---
+
+# PR 作成ルール
+
+## PR テンプレート
+
+`.github/PR_TEMPLATE/PULL_REQUEST_TEMPLATE.md`
+
+## タイトル命名規則
+
+- タイトルには Issue 番号を含める（例: `feat: フロントエンドにログイン機能を実装 (#3)`）
+- Convention Commits の形式に従う（`type: 概要 (#番号)`）
