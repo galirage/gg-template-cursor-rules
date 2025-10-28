@@ -26,7 +26,7 @@
 ### 推奨 MCP サーバー
 
 - **GitHub MCP**: Issue の作成・更新、PR の作成・更新
-  - セットアップ方法: `knowledge/github/setup-github-mcp.md` を参照
+  - セットアップ方法: [https://docs.cursor.com/ja/tools/mcp](https://docs.cursor.com/ja/tools/mcp) を参照
 - **Playwright MCP**: ブラウザ操作・E2E テスト実行
 - **Context7 MCP**: コンテキスト共有・ドキュメント参照支援
 
