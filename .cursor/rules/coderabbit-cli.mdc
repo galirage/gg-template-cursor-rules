@@ -1,0 +1,46 @@
+---
+description: CodeRabbit CLIの使用方法とコードレビューのワークフロー
+alwaysApply: false
+---
+
+# Running the CodeRabbit CLI
+
+CodeRabbit は既にターミナルにインストールされています。  
+コードレビューの方法として実行してください。
+
+## 基本コマンド
+
+- ヘルプ: `cr -h` または `coderabbit -h`
+- レビュー実行: `coderabbit --prompt-only -t uncommitted`
+
+## 使用方法
+
+一般的に、`--prompt-only` フラグを使用して CodeRabbit を実行してください。
+未コミット変更をレビューする場合（最も頻繁に使用）:
+
+```bash
+coderabbit --prompt-only -t uncommitted
+```
+
+## 重要な注意事項
+
+**重要**: コード変更をレビューするために CodeRabbit を実行する際は、同じ変更セットに対して 3 回以上実行しないでください。
+
+## レビューの種類
+
+- `uncommitted`: 未コミット変更のみ（最も頻繁に使用）
+- `committed`: コミット済み変更のみ
+- `all`: 両方（デフォルト）
+
+## ベースブランチの指定
+
+メインブランチが `main` でない場合:
+
+```bash
+coderabbit --prompt-only --base develop
+```
+
+## 実行時間について
+
+CodeRabbit のレビューには 7〜30 分以上かかる場合があります。
+バックグラウンドで実行し、定期的に結果を確認してください。
