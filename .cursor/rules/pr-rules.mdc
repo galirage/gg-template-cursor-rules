@@ -1,0 +1,58 @@
+---
+alwaysApply: false
+---
+
+# PR 作成ルール
+
+RP 作成時には以下のルールおよび作成方法に従ってください。
+
+## PR テンプレート
+
+[.github/pull_request_template.md](../../.github/pull_request_template.md)
+
+## PR タイトル命名規則
+
+- タイトルには Issue 番号を含める（例: `feat: フロントエンドにログイン機能を実装 (#3)`）
+- Convention Commits の形式に従う（`type: 概要 (#番号)`）
+- 日本語を使用する。「〜を追加」「〜を修正」など、文末は体言止めで統一する。
+- WIP (作業中) の場合は `[WIP]` プレフィックスを付ける。
+
+## PR 作成方法
+
+### 方法 1: GitHub CLI（推奨）
+
+```bash
+gh pr create \
+  --title "type: 概要" \
+  --body "PR本文" \
+  --base main \
+  --assignee @me
+```
+
+### 方法 2: GitHub MCP
+
+```
+mcp_github_create_pull_request を使用:
+
+必須パラメータ:
+- owner (string, REQUIRED): リポジトリオーナー名
+- repo (string, REQUIRED): リポジトリ名
+- title (string, REQUIRED): PRタイトル
+- head (string, REQUIRED): 変更を含むブランチ名
+- base (string, REQUIRED): マージ先ブランチ名（通常は main）
+
+オプションパラメータ:
+- body (string, OPTIONAL): PR説明文
+- draft (boolean, OPTIONAL): 下書きPRとして作成するかどうか
+- maintainer_can_modify (boolean, OPTIONAL): メンテナーがPRを変更可能かどうか
+```
+
+> **注意**: GitHub MCP が 404 エラーを返す場合がある。その場合は GitHub CLI を使用する。
+
+### リポジトリ情報の確認方法
+
+```bash
+# リモートURLを確認
+git remote -v
+# 出力例: origin https://github.com/owner/repo.git
+```
