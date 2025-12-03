@@ -6,6 +6,7 @@
 
 | コマンド | 概要 |
 |---------|------|
+| `web-research` | MCP を網羅的に活用してWeb調査を行い、レポートを/docs に作成します |
 | `create-unit-test` | 単体テストコードを生成します |
 | `review-codes` | コードレビューを実施します |
 | `commit-and-push` | 変更内容のコミットとプッシュを行います |
@@ -13,6 +14,26 @@
 | `update-documents` | 関連ドキュメントを更新します |
 
 ---
+
+## web-research
+
+**概要**: MCPを網羅的に活用して Web 調査を行い、レポートを`/docs`に作成します
+
+**用途**: 新技術、ベストプラクティス、エラー解決方法などを調査し、ドキュメント化したい場合に使用
+
+### 使用する MCP ツール
+
+- **Brave Search** (`brave_web_search`): 広範な Web 検索
+- **Perplexity** (`perplexity_ask`): 深い質問回答と情報統合
+- **Browser** (`browser_*`): 実際の Web ページ閲覧・スクリーンショット取得
+
+### 入力例
+
+```
+@commands/web-research
+
+テーマ: Azure Cosmos DB のパーティション設計ベストプラクティス
+```
 
 ## create-unit-test
 
