@@ -1,6 +1,4 @@
-# GitHub Copilot: リポジトリ指示
-
-このリポジトリは、社内配布用の Cursor / GitHub Copilot 向けルール・プロンプト集です。
+# Repository Instructions
 
 ## 重要
 
@@ -29,4 +27,3 @@ uv run ruff check . --fix
 uv run pyright .
 uv run --frozen pytest -v --tb=short --cov=src --cov-report=term
 ```
-
