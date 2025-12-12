@@ -1,9 +1,11 @@
-# Cursor Rulesテンプレート
+# Cursor / GitHub Copilot Rulesテンプレート
 
 ## 概要
 
-このリポジトリは、Cursorを使ったAI駆動開発において、
-**AIエージェントがプロジェクトの設計思想を理解し、一貫性のある高品質なコードを生成できるようにする**ためのRulesテンプレートです。
+このリポジトリは、Cursor / GitHub Copilot を使ったAI駆動開発において、AIがプロジェクトの設計思想を理解し、一貫性のある高品質なコードを生成できるようにするためのルール・プロンプト集です。
+
+- Cursor版: `.cursor/`
+- GitHub Copilot版: `.github/`
 
 > **注意** 
 > 現在、FastAPIによるバックエンドのみを対象に実装しています。
@@ -61,21 +63,54 @@
 
 ## 適用方法
 
-### 1. リポジトリをクローンまたはダウンロード
+### Cursorで使う場合
+
+#### 1. リポジトリをクローンまたはダウンロード
 
 ```bash
-git clone https://github.com/galirage/gg-template-cursor-rules.git
+git clone https://github.com/galirage/gg-template-rules.git
 ```
 
-### 2. `.cursor/rules/` ディレクトリを自身のプロジェクトにコピー
+#### 2. `.cursor/rules/` ディレクトリを自身のプロジェクトにコピー
 
 ```bash
-cp -r gg-template-cursor-rules/.cursor/rules/ your-project/.cursor/
+cp -r gg-template-rules/.cursor/rules/ your-project/.cursor/
 ```
 
-### 3. Cursorエディタでプロジェクトを開く
+#### 3. Cursorエディタでプロジェクトを開く
 
 Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules/`配下のルールファイルが**Project Rules**として読み込まれます。
+
+### GitHub Copilotで使う場合
+
+#### 1. `.github/` を自身のプロジェクトにコピー
+
+```bash
+cp -r gg-template-rules/.github your-project/
+```
+
+#### 2. 読み込まれるファイル
+
+- リポジトリ全体の指示: `.github/copilot-instructions.md`
+- パス別の指示: `.github/instructions/*.instructions.md`（先頭の `applyTo` で範囲指定）
+- 再利用プロンプト: `.github/prompts/*.prompt.md`
+
+主な prompt files:
+
+- `commit-and-push`（コミット/プッシュ）
+- `create-pull-request`（PR作成）
+- `create-unit-test`（単体テスト作成）
+- `review-codes`（コードレビュー）
+- `update-documents`（ドキュメント更新）
+
+#### 3. prompt files の利用（対応IDEのみ）
+
+prompt files は VS Code / Visual Studio / JetBrains で利用できます（プレビュー機能）。
+VS Codeで `.github/prompts/` を使うには、必要に応じて `settings.json` に `"chat.promptFiles": true` を追加してください。
+
+#### 4. Personal instructions（任意）
+
+個人指示はリポジトリにコミットできないため、`.github/personal-instructions.template.md` の内容を GitHub.com 側の **Personal instructions** に貼り付けて運用してください。
 
 ## 各Rulesの概要
 
