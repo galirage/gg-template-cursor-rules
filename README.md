@@ -7,7 +7,7 @@
 - Cursor版: `.cursor/`
 - GitHub Copilot版: `.github/`
 
-> **注意** 
+> **注意**
 > 現在、FastAPIによるバックエンドのみを対象に実装しています。
 > この後の追加予定については「今後の追加予定」をご確認ください。
 
@@ -63,24 +63,6 @@
 
 ## 適用方法
 
-### Cursorで使う場合
-
-#### 1. リポジトリをクローンまたはダウンロード
-
-```bash
-git clone https://github.com/galirage/gg-template-rules.git
-```
-
-#### 2. `.cursor/rules/` ディレクトリを自身のプロジェクトにコピー
-
-```bash
-cp -r gg-template-rules/.cursor/rules/ your-project/.cursor/
-```
-
-#### 3. Cursorエディタでプロジェクトを開く
-
-Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules/`配下のルールファイルが**Project Rules**として読み込まれます。
-
 ### GitHub Copilotで使う場合
 
 #### 1. `.github/` を自身のプロジェクトにコピー
@@ -111,6 +93,24 @@ VS Codeで `.github/prompts/` を使うには、必要に応じて `settings.jso
 #### 4. Personal instructions（任意）
 
 個人指示はリポジトリにコミットできないため、`.github/personal-instructions.template.md` の内容を GitHub.com 側の **Personal instructions** に貼り付けて運用してください。
+
+### Cursorで使う場合
+
+#### 1. リポジトリをクローンまたはダウンロード
+
+```bash
+git clone https://github.com/galirage/gg-template-rules.git
+```
+
+#### 2. `.cursor/rules/` ディレクトリを自身のプロジェクトにコピー
+
+```bash
+cp -r gg-template-rules/.cursor/rules/ your-project/.cursor/
+```
+
+#### 3. Cursorエディタでプロジェクトを開く
+
+Cursorエディタでプロジェクトを開くと、自動的に`.cursor/rules/`配下のルールファイルが**Project Rules**として読み込まれます。
 
 ## 各Rulesの概要
 
@@ -161,7 +161,7 @@ VS Codeで `.github/prompts/` を使うには、必要に応じて `settings.jso
 - **効果**
   - AIエージェントが品質基準を満たすコードを生成し、適切なコマンドで品質チェックを実行できるようになります。
 - **要参照ファイル**
-  - 本リポジトリ内の`app/backend/ruff.toml`も合わせて使用してください。 
+  - 本リポジトリ内の`app/backend/ruff.toml`も合わせて使用してください。
     - Ruff設定ファイルの参照実装
 - **カスタマイズポイント**
   - 品質ツールの選定やカバレッジ閾値の設定をプロジェクトに合わせて調整してください。
@@ -254,7 +254,6 @@ VS Codeで `.github/prompts/` を使うには、必要に応じて `settings.jso
   - AIエージェントがプロジェクトのコミットメッセージルールを理解し、適切なコミットメッセージを提案できるようになります。
 - **カスタマイズポイント**
   - typeの種類やscopeの定義、コミットメッセージの言語（日本語/英語）をプロジェクトに合わせて調整してください。
-
 
 ## 今後の追加予定
 - フロントエンド（Next.js）開発ルール
